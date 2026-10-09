@@ -147,6 +147,13 @@ def init_db():
         cursor.execute("ALTER TABLE products ADD COLUMN back_image_url TEXT")
     except Exception:
         pass
+    try:
+        cursor.execute("UPDATE products SET display_order = 1 WHERE name LIKE '%FANGS%'")
+        cursor.execute("UPDATE products SET display_order = 2 WHERE name LIKE '%STAR GIRL%'")
+        cursor.execute("UPDATE products SET display_order = 3 WHERE name LIKE '%PEQUENO%'")
+        cursor.execute("UPDATE products SET display_order = 4 WHERE name LIKE '%ANGEL%'")
+    except Exception:
+        pass
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS product_images (

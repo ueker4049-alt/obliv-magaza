@@ -566,7 +566,10 @@ def apple_touch_icon():
 @app.route('/')
 def home():
     conn = get_db()
-    all_products = conn.execute("SELECT * FROM products WHERE is_active = 1 ORDER BY display_order ASC, id ASC").fetchall()
+    all_products = conn.execute(
+        "SELECT * FROM products WHERE is_active = 1 "
+        "ORDER BY CASE WHEN LOWER(color_name) = 'siyah' THEN 0 ELSE 1 END ASC, display_order ASC, id ASC"
+    ).fetchall()
     categories = conn.execute("SELECT * FROM categories ORDER BY id ASC").fetchall()
     conn.close()
     return render_template('index.html', products=all_products, categories=categories)
@@ -574,7 +577,10 @@ def home():
 @app.route('/urunler')
 def products_page():
     conn = get_db()
-    products_raw = conn.execute("SELECT * FROM products WHERE is_active = 1 ORDER BY display_order ASC, id ASC").fetchall()
+    products_raw = conn.execute(
+        "SELECT * FROM products WHERE is_active = 1 "
+        "ORDER BY CASE WHEN LOWER(color_name) = 'siyah' THEN 0 ELSE 1 END ASC, display_order ASC, id ASC"
+    ).fetchall()
     categories = conn.execute("SELECT * FROM categories ORDER BY id ASC").fetchall()
 
     products = []
