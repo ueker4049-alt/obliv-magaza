@@ -92,6 +92,14 @@
         <!-- CONTAINER FOR INLINE IYZICO CHECKOUT FORM IF RETURNED -->
         <div id="iyzico-checkout-container" style="display:none; margin-bottom: 24px;"></div>
 
+        <!-- ACCEPTED CARDS AND PAYMENT METHODS -->
+        <div style="background: #0E1015; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center;">
+          <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;">
+            GEÇERLİ TÜM KARTLAR VE ÖDEME YÖNTEMLERİ
+          </div>
+          {% include 'payment_badges.html' %}
+        </div>
+
         <button type="submit" id="submit-order-btn" class="btn-drip-primary" style="width: 100%; justify-content: center; padding: 20px; font-size: 14px; letter-spacing: 1px;">
           ÖDEMEYE GEÇ ➔
         </button>

@@ -446,6 +446,16 @@
           ÖDEMEYE GEÇ →
         </a>
       {% endif %}
+
+      <!-- CART SHEET PAYMENT METHODS -->
+      <div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px;">
+        <div style="font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">
+          GÜVENLİ ÖDEME • TÜM KARTLAR GEÇERLİDİR
+        </div>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+          {% include 'payment_badges.html' %}
+        </div>
+      </div>
     </div>
   </aside>
 
@@ -516,30 +526,25 @@
             📍 Türkiye geneli kargo ile teslimat
           </div>
         </div>
-        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 10px; text-transform: uppercase;">
+        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 12px; text-transform: uppercase;">
           GÜVENLİ ÖDEME SEÇENEKLERİ
         </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          <span style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 6px; padding: 6px 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: #FFFFFF; display: inline-flex; align-items: center; gap: 6px;">
-            <span style="color: #FFFFFF;">🔒</span> SHOPIER
-          </span>
-          <span style="background: #141518; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; padding: 6px 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: #FFFFFF;">
-            VISA
-          </span>
-          <span style="background: #141518; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; padding: 6px 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: #FFFFFF;">
-            MASTERCARD
-          </span>
-          <span style="background: #141518; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; padding: 6px 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; color: #FFFFFF;">
-            TROY
-          </span>
+        <div style="margin-bottom: 6px;">
+          {% include 'payment_badges.html' %}
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 8px; font-family: var(--font-mono);">
+          🔒 256-Bit SSL • 3D Secure Korumalı
         </div>
       </div>
     </div>
 
-    
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px 24px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <!-- EN ALT TAB: GEÇERLİ KARTLAR & ÖDEME YÖNTEMLERİ -->
+    <div style="max-width: 1400px; margin: 0 auto; padding: 22px 24px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
       <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em;">
         &copy; 2026 OBLIV. TÜM HAKLARI SAKLIDIR.
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+        {% include 'payment_badges.html' %}
       </div>
       <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em;">
         OBLIV WEAR • OFFICIAL STORE
