@@ -72,7 +72,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Big+Shoulders+Display:wght@800;900&family=Chivo:wght@700;900&family=Cinzel:wght@700;900&family=Cormorant+Garamond:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Epilogue:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&family=Kanit:wght@700;800;900&family=Lexend:wght@700;800;900&family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Rajdhani:wght@600;700;800&family=Russo+One&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&family=Urbanist:wght@600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/static/css/style.css?v=20261009_clean_mobile_logo_v1">
+  <link rel="stylesheet" href="/static/css/style.css?v=20261009_live_chat_pro">
   <style>
     :root {
       --electric-blue: {{ settings.get('theme_color', '#FFFFFF') }};
@@ -543,21 +543,40 @@
             <div style="font-family: var(--font-mono); font-size: 10px; color: #10B981; font-weight: 700; letter-spacing: 0.06em;">AKTİF ASİSTAN • 7/24</div>
           </div>
         </div>
-        <button id="live-chat-close-btn" class="live-chat-close" aria-label="Kapat">&times;</button>
+        <div class="chat-head-actions">
+          <button type="button" id="live-chat-sound-btn" class="chat-head-tool-btn" title="Ses Bildirimi" aria-label="Ses Bildirimi">
+            <svg id="chat-sound-icon-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <svg id="chat-sound-icon-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+          <button type="button" id="live-chat-clear-btn" class="chat-head-tool-btn" title="Sohbeti Sıfırla" aria-label="Sohbeti Sıfırla">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button id="live-chat-close-btn" class="live-chat-close" aria-label="Kapat">&times;</button>
+        </div>
       </div>
 
       
       <div class="live-chat-chips-wrapper">
         <button type="button" id="chips-scroll-left" class="chips-arrow-btn" aria-label="Sola Kaydır">&#8249;</button>
         <div class="live-chat-chips" id="live-chat-chips-container">
-          <button type="button" class="chat-chip-btn" data-ask="Ödeme nasıl yapabilirim?">💳 Ödeme Nasıl Yapılır?</button>
-          <button type="button" class="chat-chip-btn" data-ask="Kargom ne zaman gelir?">🚚 Kargo & Teslimat Süresi</button>
-          <button type="button" class="chat-chip-btn" data-ask="Kumaş kalitesi ve yıkama talimatı nedir?">🧵 Kumaş Kalitesi</button>
-          <button type="button" class="chat-chip-btn" data-ask="İade ve değişim var mı?">⚠️ İade & Değişim Politikası</button>
-          <button type="button" class="chat-chip-btn" data-ask="Siparişim nerede, kargomu nasıl takip ederim?">📦 Kargo Takibi</button>
-          <button type="button" class="chat-chip-btn" data-ask="Kapıda ödeme veya havale var mı?">🏦 Havale & Kapıda Ödeme</button>
-          <button type="button" class="chat-chip-btn" data-ask="Kupon veya indirim kodu nasıl kullanılır?">🏷️ İndirim & Kupon</button>
-          <button type="button" class="chat-chip-btn" data-ask="Müşteri temsilcisi veya yetkiliye nasıl ulaşırım?">📞 Destek Talebi Aç</button>
+          <button type="button" class="chat-chip-btn" data-ask="Siparişim nerede, kargomu nasıl takip ederim?">📦 Sipariş Takibi</button>
+          <button type="button" class="chat-chip-btn" data-ask="180 boy 75 kilo hangi beden almalıyım?">📏 Beden Danışmanı</button>
+          <button type="button" class="chat-chip-btn" data-ask="Hangi t-shirt modelleri ve fiyatları var?">👕 Modeller & Fiyatlar</button>
+          <button type="button" class="chat-chip-btn" data-ask="Ödeme nasıl yapabilirim, taksit var mı?">💳 Ödeme & Taksit</button>
+          <button type="button" class="chat-chip-btn" data-ask="Kargom ne zaman gelir, kaç günde teslim edilir?">🚚 Kargo & Teslimat</button>
+          <button type="button" class="chat-chip-btn" data-ask="Kumaş kalitesi ve GSM gramajı nedir?">🧵 Kumaş Kalitesi</button>
+          <button type="button" class="chat-chip-btn" data-ask="Tişörtlerin yıkama talimatı nedir?">🧼 Yıkama Talimatı</button>
+          <button type="button" class="chat-chip-btn" data-ask="İade ve değişim politikanız nedir?">⚠️ İade Politikası</button>
+          <button type="button" class="chat-chip-btn" data-ask="Yetkili ekibinize WhatsApp'tan nasıl ulaşırım?">💬 WhatsApp Temsilci</button>
         </div>
         <button type="button" id="chips-scroll-right" class="chips-arrow-btn" aria-label="Sağa Kaydır">&#8250;</button>
       </div>
@@ -567,10 +586,17 @@
         <div class="chat-bubble chat-bubble-agent">
           <div class="bubble-sender">UMUT • DESTEK ASİSTANI</div>
           <div class="bubble-text">
-            Merhaba! Ben Umut, OBLIV canlı destek asistanıyım. Ödeme, kargo süresi, t-shirt kalıpları veya aklınıza takılan her şeyi bana sorabilirsiniz. Size nasıl yardımcı olabilirim?
+            Selamlar! Ben Umut, OBLIV canlı destek asistanınızım. Sipariş takibi, boy ve kilonuza göre beden tespiti, ürün kalıpları veya ödeme hakkında size anında yardımcı olabilirim. Nasıl yardımcı olabilirim?
           </div>
           <div class="bubble-time">Şimdi</div>
         </div>
+      </div>
+
+      
+      <div class="chat-quick-shortcuts-bar">
+        <button type="button" class="chat-shortcut-tag" data-ask="Siparişim nerede?">📦 Sipariş Sorgula</button>
+        <button type="button" class="chat-shortcut-tag" data-ask="180 boy 75 kilo hangi beden?">📏 Bedenimi Bul</button>
+        <button type="button" class="chat-shortcut-tag" data-ask="Umut ile WhatsApp görüşmesi">💬 WhatsApp</button>
       </div>
 
       
@@ -578,7 +604,7 @@
         <input 
           type="text" 
           id="live-chat-input" 
-          placeholder="Sorunuzu buraya yazın..." 
+          placeholder="Soru, sipariş no (OB-...) veya boy/kilo yazın..." 
           autocomplete="off" 
           required
         >
@@ -592,7 +618,7 @@
     </div>
   </div>
 
-  <script src="/static/js/main.js?v=20261008_white_instant"></script>
+  <script src="/static/js/main.js?v=20261009_live_chat_pro"></script>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

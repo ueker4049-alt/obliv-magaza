@@ -239,16 +239,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('live-chat-form');
     const chatInput = document.getElementById('live-chat-input');
     const chatMessages = document.getElementById('live-chat-messages');
-    const chips = document.querySelectorAll('.chat-chip-btn');
+    const soundBtn = document.getElementById('live-chat-sound-btn');
+    const clearBtn = document.getElementById('live-chat-clear-btn');
+    const soundIconOn = document.getElementById('chat-sound-icon-on');
+    const soundIconOff = document.getElementById('chat-sound-icon-off');
+    const chipsContainer = document.getElementById('live-chat-chips-container');
+    const scrollLeftBtn = document.getElementById('chips-scroll-left');
+    const scrollRightBtn = document.getElementById('chips-scroll-right');
+
     if (!toggleBtn || !chatModal) return;
+
+    // --- Audio Feedback (Web Audio API Synthesizer) ---
+    let isMuted = localStorage.getItem('obliv_chat_muted') === '1';
+    function updateSoundIcon() {
+        if (soundIconOn && soundIconOff) {
+            soundIconOn.style.display = isMuted ? 'none' : 'block';
+            soundIconOff.style.display = isMuted ? 'block' : 'none';
+        }
+    }
+    updateSoundIcon();
+
+    if (soundBtn) {
+        soundBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isMuted = !isMuted;
+            localStorage.setItem('obliv_chat_muted', isMuted ? '1' : '0');
+            updateSoundIcon();
+        });
+    }
+
+    function playChatSound() {
+        if (isMuted) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+            gain.gain.setValueAtTime(0.06, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.24);
+        } catch (e) {}
+    }
+
+    // --- Window Controls ---
     function openChat() {
         chatModal.style.display = 'flex';
-        chatInput && chatInput.focus();
-        scrollChatToBottom();
+        setTimeout(() => {
+            chatInput && chatInput.focus();
+            scrollChatToBottom();
+        }, 50);
     }
+
     function closeChat() {
         chatModal.style.display = 'none';
     }
+
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (chatModal.style.display === 'none' || !chatModal.style.display) {
@@ -257,41 +309,23 @@ document.addEventListener('DOMContentLoaded', () => {
             closeChat();
         }
     });
+
     closeBtn && closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeChat();
     });
+
     function scrollChatToBottom() {
         if (chatMessages) {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }
+
     function formatCurrentTime() {
         const d = new Date();
         return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
-    function appendUserMessage(text) {
-        const div = document.createElement('div');
-        div.className = 'chat-bubble chat-bubble-user';
-        div.innerHTML = `
-            <div class="bubble-sender">SİZ</div>
-            <div class="bubble-text">${escapeHtml(text)}</div>
-            <div class="bubble-time">${formatCurrentTime()}</div>
-        `;
-        chatMessages.appendChild(div);
-        scrollChatToBottom();
-    }
-    function appendAgentMessage(text) {
-        const div = document.createElement('div');
-        div.className = 'chat-bubble chat-bubble-agent';
-        div.innerHTML = `
-            <div class="bubble-sender">UMUT • DESTEK ASİSTANI</div>
-            <div class="bubble-text">${escapeHtml(text)}</div>
-            <div class="bubble-time">${formatCurrentTime()}</div>
-        `;
-        chatMessages.appendChild(div);
-        scrollChatToBottom();
-    }
+
     function escapeHtml(string) {
         const entityMap = {
             '&': '&amp;',
@@ -302,19 +336,126 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         return String(string).replace(/[&<>"']/g, s => entityMap[s]);
     }
+
+    function formatTextContent(raw) {
+        if (!raw) return '';
+        let escaped = escapeHtml(raw);
+        // Format bold: **text**
+        escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Format bullet points
+        escaped = escaped.replace(/\n• /g, '<br>• ');
+        // Format newlines
+        escaped = escaped.replace(/\n/g, '<br>');
+        return escaped;
+    }
+
+    // --- Message Storage in sessionStorage ---
+    const STORAGE_KEY = 'obliv_chat_history_v2';
+    function saveHistory() {
+        if (!chatMessages) return;
+        try {
+            sessionStorage.setItem(STORAGE_KEY, chatMessages.innerHTML);
+        } catch (e) {}
+    }
+
+    function loadHistory() {
+        if (!chatMessages) return;
+        try {
+            const saved = sessionStorage.getItem(STORAGE_KEY);
+            if (saved && saved.trim()) {
+                chatMessages.innerHTML = saved;
+                scrollChatToBottom();
+            }
+        } catch (e) {}
+    }
+    loadHistory();
+
+    // Clear history button
+    if (clearBtn) {
+        clearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('Sohbet geçmişini sıfırlamak istiyor musunuz?')) {
+                try {
+                    sessionStorage.removeItem(STORAGE_KEY);
+                } catch (e) {}
+                chatMessages.innerHTML = `
+                    <div class="chat-bubble chat-bubble-agent">
+                        <div class="bubble-sender">UMUT • DESTEK ASİSTANI</div>
+                        <div class="bubble-text">
+                            Selamlar! Ben Umut, OBLIV canlı destek asistanınızım. Sipariş takibi, boy ve kilonuza göre beden tespiti, ürün kalıpları veya ödeme hakkında size anında yardımcı olabilirim. Nasıl yardımcı olabilirim?
+                        </div>
+                        <div class="bubble-time">Şimdi</div>
+                    </div>
+                `;
+                saveHistory();
+                scrollChatToBottom();
+            }
+        });
+    }
+
+    function appendUserMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'chat-bubble chat-bubble-user';
+        div.innerHTML = `
+            <div class="bubble-sender">SİZ</div>
+            <div class="bubble-text">${escapeHtml(text)}</div>
+            <div class="bubble-time">${formatCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(div);
+        scrollChatToBottom();
+        saveHistory();
+    }
+
+    function appendAgentMessage(text, htmlCard) {
+        const div = document.createElement('div');
+        div.className = 'chat-bubble chat-bubble-agent';
+        
+        let contentHtml = `<div class="bubble-text">${formatTextContent(text)}</div>`;
+        if (htmlCard) {
+            contentHtml += htmlCard;
+        }
+
+        div.innerHTML = `
+            <div class="bubble-sender">UMUT • DESTEK ASİSTANI</div>
+            ${contentHtml}
+            <div class="bubble-time">${formatCurrentTime()}</div>
+        `;
+        chatMessages.appendChild(div);
+        scrollChatToBottom();
+        saveHistory();
+        playChatSound();
+    }
+
+    function updateSuggestionChips(suggestions) {
+        if (!chipsContainer || !Array.isArray(suggestions) || suggestions.length === 0) return;
+        chipsContainer.innerHTML = '';
+        suggestions.forEach(s => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'chat-chip-btn';
+            btn.setAttribute('data-ask', s);
+            btn.textContent = s;
+            btn.addEventListener('click', () => sendQuestion(s));
+            chipsContainer.appendChild(btn);
+        });
+        chipsContainer.scrollLeft = 0;
+    }
+
     async function sendQuestion(text) {
         if (!text || !text.trim()) return;
         const msg = text.trim();
         appendUserMessage(msg);
-        // Show typing indicator
+
+        // Show realistic bouncing typing indicator
         const typingDiv = document.createElement('div');
         typingDiv.className = 'chat-bubble chat-bubble-agent typing-indicator-bubble';
         typingDiv.innerHTML = `
             <div class="bubble-sender">UMUT YAZIYOR...</div>
-            <div style="font-size: 11px; color: var(--text-dim);">Düşünüyor...</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
         `;
         chatMessages.appendChild(typingDiv);
         scrollChatToBottom();
+
         try {
             const res = await fetch('/api/live-chat', {
                 method: 'POST',
@@ -323,12 +464,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             typingDiv.remove();
-            appendAgentMessage(data.reply || "Sorunuz için teşekkürler! Ekibimizle oblivwear@gmail.com adresinden de iletişim kurabilirsiniz.");
+
+            appendAgentMessage(
+                data.reply || "Sorunuz için teşekkürler! Size yardımcı olmaktan mutluluk duyarım.", 
+                data.html || null
+            );
+
+            if (data.suggestions && data.suggestions.length > 0) {
+                updateSuggestionChips(data.suggestions);
+            }
         } catch (err) {
             typingDiv.remove();
-            appendAgentMessage("Bağlantı hatası oluştu. Lütfen tekrar deneyin veya oblivwear@gmail.com adresinden bizimle iletişime geçin.");
+            appendAgentMessage(
+                "Bağlantı hatası oluştu. Lütfen tekrar deneyin veya oblivwear@gmail.com adresinden bizimle iletişime geçin.",
+                null
+            );
         }
     }
+
     chatForm && chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = chatInput.value;
@@ -336,23 +489,25 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.value = '';
         sendQuestion(text);
     });
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
+
+    // Delegate chips click
+    document.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chat-chip-btn, .chat-shortcut-tag');
+        if (chip) {
             const question = chip.getAttribute('data-ask');
             if (question) {
                 sendQuestion(question);
             }
-        });
+        }
     });
-    const chipsContainer = document.getElementById('live-chat-chips-container');
-    const scrollLeftBtn = document.getElementById('chips-scroll-left');
-    const scrollRightBtn = document.getElementById('chips-scroll-right');
+
+    // Chips horizontal navigation
     if (chipsContainer) {
         scrollLeftBtn && scrollLeftBtn.addEventListener('click', () => {
-            chipsContainer.scrollBy({ left: -140, behavior: 'smooth' });
+            chipsContainer.scrollBy({ left: -160, behavior: 'smooth' });
         });
         scrollRightBtn && scrollRightBtn.addEventListener('click', () => {
-            chipsContainer.scrollBy({ left: 140, behavior: 'smooth' });
+            chipsContainer.scrollBy({ left: 160, behavior: 'smooth' });
         });
         chipsContainer.addEventListener('wheel', (e) => {
             if (e.deltaY !== 0) {

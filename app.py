@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 import random
 import string
@@ -2002,73 +2003,389 @@ def admin_delete_user():
 
 @app.route('/api/live-chat', methods=['POST'])
 def api_live_chat():
-    """AI Assistant 'Canlı Destek - Umut' response endpoint."""
+    """Ultra-advanced AI Assistant 'Canlı Destek - Umut' with DB order lookup, size advisor, dynamic catalog query, and rich interactive cards."""
     data = request.get_json(silent=True) or {}
-    user_msg = (data.get('message') or '').strip().lower()
+    raw_msg = (data.get('message') or '').strip()
+    user_msg = raw_msg.lower()
     
     if not user_msg:
-        return jsonify({"reply": "Merhaba, ben Umut! Size OBLIV siparişleri, kargo, ödeme veya ürün kalıpları hakkında nasıl yardımcı olabilirim?"})
+        return jsonify({
+            "reply": "Merhaba! Ben Umut, OBLIV canlı destek asistanıyım. Sipariş takibi, boy/kilo beden danışmanlığı, modeller veya ödeme hakkında nasıl yardımcı olabilirim?",
+            "suggestions": ["📦 Sipariş Takibi", "📏 Bedenimi Bul", "👕 Koleksiyon & Fiyatlar", "💳 Ödeme Seçenekleri"]
+        })
+
+    default_chips = ["📦 Sipariş Takibi", "📏 Beden Danışmanı", "👕 Modeller & Fiyat", "💳 Ödeme", "🚚 Kargo Süresi", "💬 WhatsApp"]
+
+    # 1. ORDER LOOKUP / TRACKING QUERY
+    digits_only = re.sub(r'\D', '', raw_msg)
+    phone_match = re.search(r'(?:(?:90)|0)?(5\d{9})', digits_only)
     
+    ob_match = re.search(r'\b(OB-?\d{4,6})\b', raw_msg, re.I)
+    code_match = None
+    if ob_match:
+        val = ob_match.group(1).upper()
+        if not val.startswith('OB-'):
+            val = val.replace('OB', 'OB-')
+        code_match = val
+    elif not phone_match and any(k in user_msg for k in ['sipariş', 'siparis', 'kargo', 'takip', 'kod', 'no', 'durum', '#']) and re.search(r'#?(\d{5})\b', raw_msg):
+        m = re.search(r'#?(\d{5})\b', raw_msg)
+        code_match = f"OB-{m.group(1)}"
+
+    is_order_intent = any(k in user_msg for k in [
+        'siparişim nerede', 'siparisim nerede', 'kargom nerede', 'kargom nerde', 
+        'sipariş takibi', 'siparis takibi', 'takip numarası', 'kargo takip', 
+        'sipariş durumu', 'sipariş sorgula', 'siparis sorgula', 'sipariş no', 'siparis no', 'siparişim ne zaman'
+    ])
+
+    if phone_match or code_match:
+        conn = get_db()
+        cursor = conn.cursor()
+        order_row = None
+        if phone_match:
+            clean_p = phone_match.group(1)
+            order_row = cursor.execute(
+                "SELECT * FROM orders WHERE customer_phone LIKE ? ORDER BY id DESC LIMIT 1",
+                (f"%{clean_p}%",)
+            ).fetchone()
+        elif code_match:
+            order_row = cursor.execute(
+                "SELECT * FROM orders WHERE UPPER(order_number) = ? ORDER BY id DESC LIMIT 1",
+                (code_match,)
+            ).fetchone()
+
+        if order_row:
+            items = cursor.execute(
+                "SELECT product_name, size, quantity, price FROM order_items WHERE order_id = ?",
+                (order_row['id'],)
+            ).fetchall()
+            conn.close()
+
+            status = order_row['order_status'] or 'Hazırlanıyor'
+            status_color = '#10B981' if 'Kargo' in status else '#F59E0B'
+            if 'İptal' in status or 'iptal' in status.lower():
+                status_color = '#EF4444'
+            elif 'Teslim' in status or 'tamam' in status.lower():
+                status_color = '#3B82F6'
+
+            items_html = ""
+            for it in items:
+                size_badge = f"<span class='chat-item-badge'>{it['size']}</span>" if it['size'] else ""
+                items_html += f"<div class='chat-card-item'><span>{it['quantity']}x {it['product_name']}</span> {size_badge}</div>"
+
+            order_date = str(order_row['created_at'])[:10] if order_row['created_at'] else 'Bugün'
+            masked_name = mask_name_filter(order_row['customer_name'])
+
+            card_html = f"""
+            <div class='chat-order-card'>
+                <div class='chat-order-head'>
+                    <div>
+                        <div class='order-label'>SİPARİŞ KAYDI</div>
+                        <div class='order-no'>#{order_row['order_number']}</div>
+                    </div>
+                    <span class='order-status-badge' style='background: {status_color}22; color: {status_color}; border: 1px solid {status_color}55;'>● {status}</span>
+                </div>
+                <div class='chat-order-body'>
+                    <div class='order-meta-line'><span>Alıcı:</span> <strong>{masked_name}</strong></div>
+                    <div class='order-meta-line'><span>Tarih:</span> <strong>{order_date}</strong></div>
+                    <div class='order-meta-line'><span>Tutar:</span> <strong style='color: #FFFFFF;'>{order_row['total_amount']:.2f} TL</strong></div>
+                    <div class='order-items-box'>{items_html}</div>
+                </div>
+                <div class='chat-order-footer'>
+                    {"📦 Siparişiniz hazırlanmakta, 1-2 iş günü içinde kargoya teslim edilip takip linki SMS ile gönderilecektir." if 'Hazırlanıyor' in status else "🚚 Siparişiniz yola çıktı, kargo takip linki SMS/E-posta ile gönderilmiştir."}
+                </div>
+            </div>
+            """
+            return jsonify({
+                "reply": f"#{order_row['order_number']} numaralı siparişinizin güncel durumu: {status}.",
+                "html": card_html,
+                "suggestions": ["🚚 Kargo Kaç Günde Gelir?", "💬 WhatsApp Destek", "👕 Yeni Koleksiyonu Gör"]
+            })
+        else:
+            conn.close()
+            searched_val = code_match or (phone_match.group(1) if phone_match else "")
+            return jsonify({
+                "reply": f"'{searched_val}' bilgisine ait aktif bir sipariş kaydı bulunamadı. Lütfen sipariş numaranızı (Örn: OB-21499) veya 10 haneli telefon numaranızı kontrol ederek tekrar deneyiniz.",
+                "html": """
+                <div class='chat-wa-card'>
+                    <div style='font-size: 13px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;'>Siparişinizi bulamadınız mı?</div>
+                    <div style='font-size: 11px; color: var(--text-dim); margin-bottom: 10px;'>WhatsApp üzerinden sipariş detayınızı doğrudan Umut ile anında teyit edebilirsiniz.</div>
+                    <a href='https://wa.me/905514642351?text=Merhaba%2C%20sipari%C5%9Fim%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum' target='_blank' rel='noopener' class='chat-wa-btn'>💬 WhatsApp ile Hemen Bağlan</a>
+                </div>
+                """,
+                "suggestions": ["Örnek: OB-21499", "0551...", "💬 WhatsApp Destek"]
+            })
+
+    elif is_order_intent:
+        return jsonify({
+            "reply": "Siparişinizi anlık olarak sorgulamak için lütfen **sipariş numaranızı (Örn: OB-21499)** veya siparişte kullandığınız **telefon numaranızı** yazınız.",
+            "suggestions": ["OB-21499", "0551...", "🚚 Kargo Kaç Günde Gelir?", "💬 WhatsApp Destek"]
+        })
+
+    # 2. SMART STREETWEAR SIZE RECOMMENDER (BEDEN DANIŞMANI)
+    h_match = re.search(r'(?:boy(?:um)?\s*[:=]?\s*(\d{2,3})|\b(1[5-9]\d|20\d)\s*(?:cm)?\b|(?:1[.,](\d{2})))', raw_msg, re.I)
+    w_match = re.search(r'(?:kilo(?:m)?\s*[:=]?\s*(\d{2,3})|\b([4-9]\d|1[0-4]\d)\s*(?:kg|kilo)\b)', raw_msg, re.I)
+    
+    parsed_height = None
+    parsed_weight = None
+    if h_match:
+        for g in h_match.groups():
+            if g:
+                val = int(g)
+                if val < 100:
+                    val = 100 + val
+                if 140 <= val <= 220:
+                    parsed_height = val
+                    break
+    if w_match:
+        for g in w_match.groups():
+            if g:
+                val = int(g)
+                if 40 <= val <= 160:
+                    parsed_weight = val
+                    break
+
+    if parsed_height or parsed_weight:
+        h = parsed_height or 175
+        w = parsed_weight or 70
+        
+        if w <= 62 or (h < 172 and w < 66):
+            rec_size = "S"
+            fit_text = "OBLIV t-shirt kalıpları dökümlü sokak tarzı (boxy/oversize) kesimdir. S beden üzerinizde omuzları hafif düşük, göğüs kısmı rahat dökülecek şekilde tam modern sokak stilini yansıtır."
+        elif w <= 76 and h <= 182:
+            rec_size = "M"
+            fit_text = "M beden boy ve kilo ölçülerinize göre ideal dökümlü streetwear silüeti oluşturur. Omuzlar hafif düşük (drop-shoulder) durur ve ferah sokak modası görünümü sağlar."
+        elif w <= 88 and h <= 190:
+            rec_size = "L"
+            fit_text = "L beden sizin için tam dökümlü sokak modası oversize duruşunu yakalar. Ne aşırı sarkar ne de dar kalır, tok ve heybetli durur."
+        else:
+            rec_size = "XL"
+            fit_text = "XL beden geniş omuz yapısı ve ferah silüeti ile üzerinizde tam dökümlü ve havalı bir sokak tarzı sunacaktır."
+
+        stats_line = f"{h} cm" if parsed_height else ""
+        if parsed_weight:
+            stats_line = f"{stats_line} • {w} kg" if stats_line else f"{w} kg"
+
+        size_card = f"""
+        <div class='chat-size-card'>
+            <div class='chat-size-head'>
+                <span class='size-tag'>BOXY OVERSIZE KALIP DANIŞMANI</span>
+                <span class='size-stats'>{stats_line}</span>
+            </div>
+            <div class='chat-size-badge-wrap'>
+                <div class='chat-size-badge'>{rec_size}</div>
+                <div>
+                    <div style='font-size: 14px; font-weight: 800; color: #FFFFFF;'>ÖNERİLEN BEDEN: {rec_size}</div>
+                    <div style='font-size: 11px; color: #10B981; font-weight: 600;'>Kusursuz Drop-Shoulder Döküm</div>
+                </div>
+            </div>
+            <div class='chat-size-desc'>{fit_text}</div>
+            <div class='chat-size-tip'>💡 <strong>İpucu:</strong> Eğer standart oversize yerine çok daha salaş ve rapçi tarzı aşırı bol durmasını isterseniz 1 beden büyük tercih edebilirsiniz.</div>
+        </div>
+        """
+        return jsonify({
+            "reply": f"Ölçülerinize ({stats_line}) göre sizin için önerilen ideal beden: {rec_size} Beden.",
+            "html": size_card,
+            "suggestions": ["👕 T-Shirt Modellerini Gör", "🧵 Kumaş Kalitesi Nasıl?", "💳 Ödeme Nasıl Yapılır?"]
+        })
+
+    is_size_query = any(k in user_msg for k in ['beden', 'kalıp', 'kalip', 'kilo', 'boy', 'ölçü', 'olcu', 'oversize', 'boxy', 'hangi beden', 'dar mı', 'bol mu'])
+    if is_size_query:
+        return jsonify({
+            "reply": "OBLIV t-shirtlerimiz standart sokak modası dökümlü **Boxy Oversize (Düşük Omuz)** kalıptadır. Günlük hayatta giydiğiniz bedeni aldığınızda dökümlü harika bir sokak stili yakalarsınız.\n\nSize tam bedeninizi söylemem için lütfen **boyunuzu ve kilonuzu** yazın! (Örnek: *180 boy 75 kilo*)",
+            "suggestions": ["175 boy 70 kilo", "180 boy 76 kilo", "185 boy 84 kilo", "🧵 Kumaş Kalitesi"]
+        })
+
+    # 3. SPECIFIC PRODUCT & CATALOG QUERIES
+    product_keywords = {
+        'angel': '444 ANGEL',
+        'travis': 'TRAVIS SCOTT',
+        'cactus': 'TRAVIS SCOTT',
+        'tecca': 'LIL TECCA',
+        'trippie': 'TRIPPIE REDD',
+        '1400': 'TRIPPIE REDD',
+        'uzi': 'LIL UZI VERT',
+        'music': 'I AM MUSIC',
+        'carti': 'I AM MUSIC',
+        'blonde': 'FRANK OCEAN',
+        'frank': 'FRANK OCEAN',
+        'pequeno': 'ZÉ PEQUENO',
+        'deviant': 'DEVIANT FANGS',
+        'fangs': 'DEVIANT FANGS',
+        'star girl': 'STAR GIRL',
+        'lips': 'ROLLING LIPS',
+        'rolling': 'ROLLING LIPS'
+    }
+
+    matched_kw = None
+    for kw, p_query in product_keywords.items():
+        if kw in user_msg:
+            matched_kw = p_query
+            break
+
+    if matched_kw:
+        conn = get_db()
+        cursor = conn.cursor()
+        prod = cursor.execute(
+            "SELECT id, name, price, stock, image_url, fabric, gsm_weight, fit FROM products WHERE UPPER(name) LIKE ? AND is_active = 1 LIMIT 1",
+            (f"%{matched_kw.upper()}%",)
+        ).fetchone()
+        conn.close()
+
+        if prod:
+            stock_badge = "🟢 Stokta Var" if prod['stock'] > 10 else f"🟡 Son {prod['stock']} Adet"
+            img_src = prod['image_url'] or '/static/images/obliv_brand_official.png'
+            p_card = f"""
+            <div class='chat-product-card'>
+                <img src='{img_src}' alt='{prod['name']}' class='chat-product-thumb'>
+                <div class='chat-product-info'>
+                    <div class='chat-product-title'>{prod['name']}</div>
+                    <div class='chat-product-meta'>
+                        <span class='chat-product-price'>{prod['price']:.0f} TL</span>
+                        <span class='chat-product-stock'>{stock_badge}</span>
+                    </div>
+                    <div style='font-size: 11px; color: var(--text-dim); margin-top: 4px;'>240+ GSM Ağır Kompakt Penye • Boxy Kalıp</div>
+                    <a href='/product/{prod['id']}' class='chat-product-link-btn'>Ürünü Hemen İncele →</a>
+                </div>
+            </div>
+            """
+            return jsonify({
+                "reply": f"{prod['name']} modelimiz stokta aktiftir. Fiyatı {prod['price']:.0f} TL'dir.",
+                "html": p_card,
+                "suggestions": [f"{prod['name']} Bedenim Ne?", "💳 Ödeme Seçenekleri", "🚚 Kargo Ne Zaman Gelir?"]
+            })
+
+    is_catalog_query = any(k in user_msg for k in ['ürünler', 'urunler', 'modeller', 'tişörtler', 'tisort', 'katalog', 'fiyatlar', 'koleksiyon', 'neler var', 'kaç para', 'stok'])
+    if is_catalog_query:
+        conn = get_db()
+        cursor = conn.cursor()
+        prods = cursor.execute("SELECT id, name, price, stock FROM products WHERE is_active = 1 ORDER BY id ASC LIMIT 6").fetchall()
+        conn.close()
+
+        prods_list_html = "".join([
+            f"<div class='chat-card-item'><strong>{p['name']}</strong> <span style='color: #FFFFFF; font-weight: 800;'>{p['price']:.0f} TL</span></div>"
+            for p in prods
+        ])
+        cat_card = f"""
+        <div class='chat-order-card'>
+            <div style='font-family: var(--font-display); font-size: 14px; font-weight: 900; color: #FFFFFF; margin-bottom: 8px;'>🔥 AKTİF T-SHIRT KOLEKSİYONU</div>
+            <div class='order-items-box'>{prods_list_html}</div>
+            <div style='margin-top: 10px; text-align: center;'>
+                <a href='/' class='chat-product-link-btn' style='display: block; text-align: center;'>Tüm Koleksiyonu Ana Sayfada Gör →</a>
+            </div>
+        </div>
+        """
+        return jsonify({
+            "reply": "OBLIV yeni nesil ağır gramaj t-shirt serimizde şu an öne çıkan modellerimiz ve fiyatları aşağıdadır:",
+            "html": cat_card,
+            "suggestions": ["444 Angel T-Shirt", "Travis Scott T-Shirt", "Lil Tecca T-Shirt", "📏 Beden Danışmanı"]
+        })
+
+    # 4. PAYMENT & SHOPIER
+    if any(w in user_msg for w in ['ödeme', 'odeme', 'kart', 'taksit', 'shopier', 'iyzico', 'nasıl öderim', 'nasil oderim', 'güvenli mi']):
+        return jsonify({
+            "reply": "Ödemelerinizi Shopier resmi güvencesiyle tüm kredi ve banka kartlarınızla (3D Secure korumalı) tek çekim veya taksitle 7/24 hızlı ve %100 güvenle gerçekleştirebilirsiniz. Kart bilgileriniz 256-bit SSL ile doğrudan banka onayına gider, asla saklanmaz.",
+            "suggestions": ["🚚 Kargo Kaç Günde Gelir?", "📏 Beden Danışmanı", "🏷️ İndirim Kodu"]
+        })
+
+    if any(w in user_msg for w in ['havale', 'eft', 'kapıda ödeme', 'kapida']):
+        return jsonify({
+            "reply": "Maksimum alıcı güvenliği, anında faturalandırma ve hızlı kargo çıkışı sebebiyle siparişlerimizi Shopier 3D Secure kart altyapısı üzerinden kabul ediyoruz. Tüm banka, kredi kartları ve ön ödemeli kartlar (Papara, ininal, Tosla vb.) geçerlidir.",
+            "suggestions": ["💳 Kartla Ödeme Nasıl Yapılır?", "📦 Sipariş Takibi", "💬 WhatsApp Destek"]
+        })
+
+    # 5. SHIPPING & DELIVERY
+    if any(w in user_msg for w in ['kargo', 'teslimat', 'ne zaman gelir', 'ne zaman ulaşır', 'kaç gün', 'kac gun', 'süre', 'gönderim', 'kargom']):
+        return jsonify({
+            "reply": "🚚 **Teslimat Süreci:**\n• Siparişleriniz 1-2 iş günü içerisinde özenle paketlenip anlaşmalı kargoya teslim edilir.\n• Kargoya verildikten sonra Türkiye geneline ortalama **1 ila 3 iş günü** içinde adresinize ulaşır.\n• Kargo takip numaranız ve canlı takip linkiniz SMS ve e-posta ile otomatik iletilir.",
+            "suggestions": ["📦 Siparişim Nerede?", "💳 Ödeme Seçenekleri", "💬 WhatsApp Destek"]
+        })
+
+    # 6. FABRIC & GSM & QUALITY
+    if any(w in user_msg for w in ['kumaş', 'kumas', 'kalite', 'pamuk', 'gsm', 'çeker mi', 'solma', 'baskı', 'baski']):
+        return jsonify({
+            "reply": "🧵 **Kumaş & Üretim Kalitesi:**\n• **240+ GSM Ağır Gramaj:** Tok, dökümlü ve formunu kaybetmeyen lüks sokak giyimi kumaşı.\n• **%100 Saf Kompakt Penye Pamuk:** Terletmeyen, nefes alan ve yumuşak ten dokusu.\n• **Özel Serigrafi Baskı:** Yüksek dayanımlı baskı teknolojisi sayesinde çatlama, soyulma veya solma yapmaz.\n• **Çift Dikişli Yaka:** Yıkamalarda esnemez ve bozulmaz.",
+            "suggestions": ["🧼 Yıkama Talimatı Nedir?", "📏 Beden Danışmanı", "👕 Modelleri Gör"]
+        })
+
+    # 7. WASHING & CARE
+    if any(w in user_msg for w in ['yıkama', 'yikama', 'talimat', 'kaç derece', 'kac derece', 'ütü', 'utu']):
+        return jsonify({
+            "reply": "🧼 **Yıkama ve Bakım Kılavuzu:**\n1. T-shirtünüzü mutlaka **ters çevirerek** maksimum **30°C** hassas programda yıkayınız.\n2. Baskı ve kumaş formunu korumak için **kurutma makinesine atmayınız**, sererek kurutunuz.\n3. Ütüleme yaparken t-shirtü ters çevirip orta ısıda ütüleyiniz, baskı üzerine direkt ütü basmayınız.",
+            "suggestions": ["🧵 Kumaş Kalitesi", "📏 Beden Danışmanı", "👕 Ürünler"]
+        })
+
+    # 8. RETURN & EXCHANGE
+    if any(w in user_msg for w in ['iade', 'değişim', 'degisim', 'iptal', 'geri gönderme']):
+        return jsonify({
+            "reply": "⚠️ **İade ve Değişim Politikası:**\nOBLIV koleksiyonları sınırlı sayıda butik drop olarak üretilmektedir. Bu nedenle standart keyfi iade ve beden değişimi yapılamamaktadır.\n\nSipariş vermeden önce canlı destekten **beden danışmanımıza** danışmanızı öneririz. Kargo hasarı veya nadir kusurlu ürün durumunda ise derhal birebir telafi ve yeni ürün gönderimi sağlanmaktadır.",
+            "suggestions": ["📏 Bedenimi Bul", "💬 WhatsApp Yetkilisi", "💳 Ödeme"]
+        })
+
+    # 9. COUPON & PROMOTIONS
+    if any(w in user_msg for w in ['kupon', 'indirim kodu', 'promosyon', 'kampanya', 'indirim']):
+        return jsonify({
+            "reply": "🏷️ Aktif indirim kodunuz varsa sepet sayfasındaki 'Kupon Kodu' alanına girerek 'Uygula' butonuna basmanız yeterlidir. Şu an mağazamızdaki lansman fiyatları özel indirimli olarak listelenmektedir!",
+            "suggestions": ["👕 İndirimli Ürünler", "💳 Ödeme Adımları", "📏 Beden Danışmanı"]
+        })
+
+    # 10. WHATSAPP & HUMAN AGENT
+    if any(w in user_msg for w in ['temsilci', 'yetkili', 'telefon', 'mail', 'eposta', 'destek', 'iletişim', 'iletisim', 'ulaş', 'whatsapp', 'umut', 'insan']):
+        return jsonify({
+            "reply": "Canlı destek yetkilimiz Umut'a WhatsApp üzerinden doğrudan mesaj atabilir veya e-posta yoluyla bize 7/24 ulaşabilirsiniz.",
+            "html": """
+            <div class='chat-wa-card'>
+                <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 8px;'>
+                    <div style='width: 36px; height: 36px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; font-size: 18px;'>📲</div>
+                    <div>
+                        <div style='font-size: 14px; font-weight: 800; color: #FFFFFF;'>UMUT • RESMİ DESTEK</div>
+                        <div style='font-size: 11px; color: #10B981; font-weight: 600;'>WhatsApp Destek Hattı</div>
+                    </div>
+                </div>
+                <div style='font-size: 12px; color: var(--text-dim); margin-bottom: 12px;'>Aklınıza takılan özel sorular veya sipariş detayları için tek tıkla mesaj başlatın:</div>
+                <a href='https://wa.me/905514642351?text=Merhaba%20OBLIV%20Canl%C4%B1%20Destek%27ten%20yaz%C4%B1yorum' target='_blank' rel='noopener' class='chat-wa-btn'>💬 WhatsApp ile Hemen Yaz</a>
+                <div style='font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center;'>E-Posta: oblivwear@gmail.com</div>
+            </div>
+            """,
+            "suggestions": ["📦 Sipariş Takibi", "📏 Beden Danışmanı", "👕 Koleksiyonu Gör"]
+        })
+
+    # 11. WHO ARE WE / BRAND INFO
+    if any(w in user_msg for w in ['biz kimiz', 'obliv', 'neredesiniz', 'mağaza', 'magaza', 'kimsiniz', 'güvenilir']):
+        return jsonify({
+            "reply": "OBLIV, yüksek sokak modasını (streetwear) ağır gramaj lüks kumaşlar ve tavizsiz tasarım estetiğiyle buluşturan yeni nesil bir giyim markasıdır. Tasarımlarımız sınırlı adetli drop'lar şeklinde butik olarak üretilir. Tüm ödemeler resmi Shopier 3D Secure koruması altındadır.",
+            "suggestions": ["👕 T-Shirt Modelleri", "🧵 Kumaş Kalitesi", "💳 Ödeme Güvenliği"]
+        })
+
+    # 12. GREETINGS & CASUAL
     if any(w in user_msg for w in ['nasılsın', 'nasilsin', 'naber', 'ne haber', 'napıyorsun', 'napiyosun', 'iyi misin', 'keyifler']):
-        greetings = [
-            "İyiyim, teşekkür ederim! OBLIV mağazamızda siparişleriniz ve ürünlerimiz hakkında size yardımcı olmak için buradayım. Bugün nasıl gidiyor?",
-            "Gayet iyiyim, sorduğunuz için çok teşekkürler! Size OBLIV t-shirt koleksiyonu veya aklınıza takılan bir konuda yardımcı olabilir miyim?",
-            "Harikayım! Yeni sokak giyimi serimizle ilgilenen ziyaretçilerimize destek veriyorum. Size nasıl yardımcı olabilirim?"
-        ]
-        return jsonify({"reply": random.choice(greetings)})
+        return jsonify({
+            "reply": "Harikayım, teşekkürler! OBLIV sokak giyimi mağazamızda siparişleriniz, kargo, ödeme ve beden seçiminiz için 7/24 buradayım. Bugün nasıl yardımcı olabilirim?",
+            "suggestions": ["📏 Beden Danışmanı", "📦 Siparişim Nerede?", "👕 Modeller & Fiyatlar", "💬 WhatsApp Destek"]
+        })
 
-    elif any(w in user_msg for w in ['selam', 'merhaba', 'iyi günler', 'kolay gelsin', 'slm', 'hey', 'günaydın', 'iyi akşamlar']):
-        replies = [
-            "Merhaba! Hoş geldiniz. Ben Umut, OBLIV canlı destek asistanıyım. Size bugün nasıl yardımcı olabilirim?",
-            "Selamlar! OBLIV mağazamıza hoş geldiniz. Ürünler, kalıplar veya sipariş hakkında merak ettiğiniz bir şey var mı?",
-            "İyi günler! Ben Umut. Sipariş adımları veya koleksiyonumuzla ilgili aklınıza takılan her şeyi bana sorabilirsiniz."
-        ]
-        return jsonify({"reply": random.choice(replies)})
+    if any(w in user_msg for w in ['selam', 'merhaba', 'iyi günler', 'kolay gelsin', 'slm', 'hey', 'günaydın', 'iyi akşamlar', 'hi', 'hello']):
+        return jsonify({
+            "reply": "Selamlar, hoş geldiniz! Ben Umut, OBLIV canlı destek asistanınızım. Sipariş takibi, boy/kilonuza göre beden bulma, t-shirt kalıpları veya ödeme hakkında merak ettiğiniz her şeyi yanıtlayabilirim.",
+            "suggestions": ["📏 Bedenimi Bul", "📦 Sipariş Sorgula", "👕 Ürünleri Listele", "💳 Ödeme Nasıl Yapılır?"]
+        })
 
-    elif any(w in user_msg for w in ['adın ne', 'adin ne', 'sen kimsin', 'kimsin', 'ismin ne']):
-        return jsonify({"reply": "Ben Umut! OBLIV sokak giyimi canlı destek uzmanıyım. Siparişleriniz, kargo, ödeme veya beden seçiminde size rehberlik etmek için buradayım."})
+    if any(w in user_msg for w in ['teşekkür', 'tesekkur', 'eyvallah', 'sağol', 'sagol', 'tşk', 'tsk', 'adamsın', 'kralsın']):
+        return jsonify({
+            "reply": "Rica ederim, ne demek! Yardımcı olabildiysem çok sevindim. Başka bir sorun olursa istediğin an buradayım. Keyifli alışverişler!",
+            "suggestions": ["👕 Koleksiyonu İncele", "📦 Sipariş Durumu", "💬 WhatsApp"]
+        })
 
-    elif any(w in user_msg for w in ['teşekkür', 'tesekkur', 'eyvallah', 'sağol', 'sagol', 'tşk', 'tsk']):
-        return jsonify({"reply": "Rica ederim! Yardımcı olabildiysem ne mutlu bana. Başka bir sorunuz olursa her zaman buradayım!"})
+    if any(w in user_msg for w in ['tamam', 'ok', 'anladım', 'anladim', 'peki', 'görüşürüz', 'bay', 'bb']):
+        return jsonify({
+            "reply": "Anlaştık! Başka merak ettiğin bir konu olursa dilediğin an yazabilirsin. İyi günler ve şık kombinler dilerim!",
+            "suggestions": default_chips[:4]
+        })
 
-    elif any(w in user_msg for w in ['tamam', 'ok', 'anladım', 'anladim', 'peki', 'görüşürüz', 'bay']):
-        return jsonify({"reply": "Harika! Keyifli alışverişler dilerim. İstediğiniz zaman tekrar yazabilirsiniz!"})
-
-    elif any(w in user_msg for w in ['ödeme', 'odeme', 'kart', 'taksit', 'shopier', 'iyzico', 'nasıl öderim', 'nasil oderim', 'güvenli mi']):
-        return jsonify({"reply": "Ödemelerinizi Shopier güvencesiyle tüm kredi ve banka kartlarınızla (3D Secure korumalı) tek çekim veya taksitle 7/24 hızlı ve güvenle gerçekleştirebilirsiniz."})
-
-    elif any(w in user_msg for w in ['havale', 'eft', 'kapıda ödeme', 'kapida']):
-        return jsonify({"reply": "Şu anda maksimum alıcı güvenliği ve hızlı kargo süreci sebebiyle ödemelerimizi Shopier 3D Secure kart altyapısı üzerinden kabul ediyoruz. Kapıda ödeme veya manuel havale yerine Shopier ile tüm banka ve kredi kartlarınızla güvenle sipariş oluşturabilirsiniz."})
-
-    elif any(w in user_msg for w in ['kargo takip', 'siparişim nerede', 'kargom nerede', 'takip numarası', 'kargom nerde']):
-        return jsonify({"reply": "Siparişiniz kargoya teslim edildiğinde SMS ve e-posta adresinize MNG/Yurtiçi Kargo takip linkiniz otomatik gönderilir. Ayrıca hesabınıza giriş yaparak 'Profilim / Siparişlerim' sayfasından da anlık kargo durumunu görebilirsiniz."})
-
-    elif any(w in user_msg for w in ['kargo', 'teslimat', 'ne zaman gelir', 'ne zaman ulaşır', 'kaç gün', 'kac gun', 'süre', 'gönderim']):
-        return jsonify({"reply": "Siparişleriniz 1-2 iş günü içerisinde özenle paketlenip anlaşmalı kargoya verilir. Kargoya verildikten sonra Türkiye geneline ortalama 1 ila 3 iş günü içinde adresinize teslim edilir."})
-
-    elif any(w in user_msg for w in ['kupon', 'indirim kodu', 'promosyon', 'kampanya']):
-        return jsonify({"reply": "Aktif indirim kodunuz varsa sepet sayfasındaki veya ödeme adımındaki 'Kupon Kodu' alanına girerek anında indirimden yararlanabilirsiniz. Yeni sezon lansman indirimlerimiz t-shirtlerimize halihazırda yansıtılmıştır!"})
-
-    elif any(w in user_msg for w in ['yıkama', 'yikama', 'talimat', 'kaç derece', 'kac derece', 'ütü']):
-        return jsonify({"reply": "OBLIV t-shirtlerinizi uzun yıllar ilk günkü formunda kullanmak için: Ters çevirerek maksimum 30°C'de yıkayınız, kurutma makinesine atmayınız ve baskı/nakış kısımlarını tersten orta ısıda ütüleyiniz."})
-
-    elif any(w in user_msg for w in ['iade', 'değişim', 'degisim', 'iptal', 'geri gönderme']):
-        return jsonify({"reply": "Mağazamızda özel butik ve sınırlı üretim sebebiyle iade ve beden/kalıp değişimi yapılmamaktadır. Siparişinizi vermeden önce ürün sayfasındaki detaylı beden öneri tablosunu incelemenizi rica ederiz. Diğer tüm sorularınız için destek talebi açabilirsiniz."})
-
-    elif any(w in user_msg for w in ['beden', 'kalıp', 'kalip', 'kilo', 'boy', 'ölçü', 'olcu', 'oversize', 'boxy']):
-        return jsonify({"reply": "T-shirtlerimiz rahat ve dökümlü standart kalıptadır. Günlük hayatta giydiğiniz normal bedeninizi tercih edebilirsiniz. Boy ve kilonuza göre tam bedeni seçmek için ürün sayfasındaki beden tablosuna göz atabilirsiniz."})
-
-    elif any(w in user_msg for w in ['kumaş', 'kumas', 'kalite', 'pamuk', 'gsm', 'çeker mi', 'solma']):
-        return jsonify({"reply": "Tüm ürünlerimiz %100 pamuk penye kumaştan üretilmektedir. Yumuşak, terletmeyen ve nefes alan yapıya sahiptir. 30 derecede tersten yıkandığında çekme veya solma yapmaz."})
-
-    elif any(w in user_msg for w in ['temsilci', 'yetkili', 'telefon', 'mail', 'eposta', 'destek', 'iletişim', 'iletisim', 'ulaş']):
-        return jsonify({"reply": "Yetkili ekibimize doğrudan 'oblivwear@gmail.com' e-posta adresimizden 7/24 ulaşabilirsiniz. Talepleriniz ekibimiz tarafından en geç 2-4 saat içinde yanıtlanmaktadır."})
-
-    elif any(w in user_msg for w in ['biz kimiz', 'obliv', 'neredesiniz', 'mağaza', 'magaza', 'kimsiniz']):
-        return jsonify({"reply": "OBLIV, yüksek sokak modasını ağır gramaj kumaş ve modern silüetlerle buluşturan yeni nesil bir giyim markasıdır. Tasarımlarımız sınırlı adetlerde, butik ve tavizsiz kalite anlayışıyla üretilir."})
-
-    else:
-        return jsonify({"reply": "Bu konuyu tam anlayamadım ama yardımcı olmak isterim! Sipariş adımları, kargo süresi, beden seçimi, kumaş özellikleri veya ödeme hakkında detaylı bilgi verebilirim. Dilerseniz yukarıdaki hazır konu başlıklarına da tıklayabilirsiniz."})
+    # 13. FALLBACK INTENT
+    return jsonify({
+        "reply": "Bu konuyu tam anlayamadım ama hemen yardımcı olmak isterim! Aşağıdaki hazır seçeneklerden birini seçebilir veya sipariş takibi, beden sorgulama, kumaş özellikleri ve ödeme hakkında soru sorabilirsiniz:",
+        "suggestions": ["📦 Siparişimi Sorgula", "📏 Bedenimi Bul", "👕 Koleksiyon & Fiyatlar", "💳 Ödeme Yöntemleri", "🚚 Kargo Süresi", "💬 WhatsApp Yetkilisi"]
+    })
 
 @app.route('/support')
 def support_tickets_list():
