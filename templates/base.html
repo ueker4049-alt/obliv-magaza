@@ -72,7 +72,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Big+Shoulders+Display:wght@800;900&family=Chivo:wght@700;900&family=Cinzel:wght@700;900&family=Cormorant+Garamond:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Epilogue:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&family=Kanit:wght@700;800;900&family=Lexend:wght@700;800;900&family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Rajdhani:wght@600;700;800&family=Russo+One&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&family=Urbanist:wght@600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/static/css/style.css?v=20261009_top_nav_cart_v1">
+  <link rel="stylesheet" href="/static/css/style.css?v=20261009_clean_cart_link_v1">
   <style>
     :root {
       --electric-blue: {{ settings.get('theme_color', '#FFFFFF') }};
@@ -195,9 +195,8 @@
         gap: 10px !important;
       }
       .top-brand img {
-        height: 42px !important;
-        max-width: 155px !important;
-        filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 5px rgba(255, 255, 255, 1)) !important;
+        height: 38px !important;
+        max-width: 140px !important;
       }
       .top-search-wrapper {
         flex: 1 !important;
@@ -223,86 +222,12 @@
         width: 18px !important;
         height: 18px !important;
       }
-      .mobile-drawer-head img {
-        filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 5px rgba(255, 255, 255, 1)) !important;
-      }
-
-      /* Mobilde PC seviyesinde güçlü ürün spotlight & t-shirt neon glow */
-      .drip-img-wrap {
-        background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.28) 0%, rgba(22, 28, 44, 0.98) 55%, #0B0D13 100%) !important;
-      }
-      .drip-img-wrap::before {
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) translateZ(0) !important;
-        width: 170px !important;
-        height: 170px !important;
-        border-radius: 50% !important;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.18) 45%, transparent 70%) !important;
-        opacity: 1 !important;
-        pointer-events: none !important;
-      }
-      .drip-img-wrap img {
-        filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95)) !important;
-        transform: translateZ(0) !important;
-      }
-      .dock-link {
-        font-size: 10px !important;
-        height: 36px !important;
-        padding: 0 8px !important;
-      }
       /* Canlı destek butonu konumu */
       .live-chat-pill {
         bottom: 24px !important;
         right: 20px !important;
         padding: 6px 12px !important;
       }
-    }
-
-    .top-nav-cart-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 7px !important;
-      height: 36px !important;
-      padding: 0 16px !important;
-      background: #FFFFFF !important;
-      color: #000000 !important;
-      border-radius: 999px !important;
-      font-family: var(--font-mono) !important;
-      font-size: 11px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.12em !important;
-      text-transform: uppercase !important;
-      border: 1px solid rgba(255, 255, 255, 0.25) !important;
-      cursor: pointer !important;
-      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-      outline: none !important;
-      margin-left: 4px !important;
-    }
-    .top-nav-cart-btn:hover {
-      background: #E5E7EB !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 22px rgba(255, 255, 255, 0.6) !important;
-    }
-    .top-nav-cart-btn:active {
-      transform: translateY(0) scale(0.97) !important;
-    }
-    .top-cart-badge {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-      min-width: 17px !important;
-      height: 17px !important;
-      padding: 0 5px !important;
-      border-radius: 999px !important;
-      font-family: var(--font-mono) !important;
-      font-size: 10px !important;
-      font-weight: 900 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 1 !important;
     }
   </style>
   {% block extra_head %}{% endblock %}
@@ -321,10 +246,10 @@
         {% if current_user and current_user['role'] == 'admin' %}
           <a href="/admin" class="top-nav-link" style="color: var(--electric-blue);">PANEL</a>
         {% endif %}
-        <button id="cart-toggle-btn" class="top-nav-cart-btn" aria-label="Sepeti Aç">
+        <a href="javascript:void(0)" id="cart-toggle-btn" class="top-nav-link" aria-label="Sepeti Aç">
           <span>SEPET</span>
-          <span class="top-cart-badge cart-count-badge" style="display: none;">0</span>
-        </button>
+          <span class="cart-count-badge" style="display: none; background: rgba(255, 255, 255, 0.15); color: #FFFFFF; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; margin-left: 4px;">0</span>
+        </a>
       </nav>
 
       <!-- Canlı Arama Çubuğu (Belirgin & Net Search Bar) -->
