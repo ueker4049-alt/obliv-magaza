@@ -23,25 +23,335 @@
   }
 }
 </script>
+<style>
+  /* --- OBLIV LUXURY PRODUCT GALLERY SLIDER (MOBILE TOUCH SWIPE & DESKTOP NAV) --- */
+  .product-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: rgba(11, 13, 18, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+  }
+  .product-top-bar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    font-weight: 800;
+    color: #E5E7EB;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .product-top-bar-link:hover {
+    border-color: var(--electric-blue);
+    background: rgba(36, 83, 255, 0.12);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+  }
+
+  .product-gallery-slider-wrap {
+    width: 100%;
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #0B0D12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .product-slider-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    touch-action: pan-x pan-y;
+  }
+  .product-slider-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 480px;
+    max-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    position: relative;
+    cursor: zoom-in;
+  }
+
+  .product-slide-img {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    max-height: 460px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+    filter: drop-shadow(0 0 20px rgba(36, 83, 255, 0.35));
+  }
+
+  /* Slide Counter Badge */
+  .slider-counter-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(10, 12, 18, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #FFFFFF;
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    z-index: 6;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Nav Chevrons */
+  .slider-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(10, 12, 18, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 6;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    opacity: 0.9;
+  }
+  .slider-nav-arrow:hover {
+    background: rgba(36, 83, 255, 0.9);
+    border-color: var(--electric-blue);
+    opacity: 1;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 0 16px rgba(36, 83, 255, 0.7);
+  }
+  .slider-nav-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  .slider-arrow-prev {
+    left: 12px;
+  }
+  .slider-arrow-next {
+    right: 12px;
+  }
+
+  /* Modern Pill Dots */
+  .slider-dots-container {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(10, 12, 18, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+    z-index: 6;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slider-dot.active {
+    width: 24px;
+    background: var(--electric-blue);
+    box-shadow: 0 0 12px rgba(36, 83, 255, 0.9);
+  }
+
+  /* Lightbox Button */
+  .slider-lightbox-btn {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    background: rgba(10, 12, 18, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    z-index: 6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+  .slider-lightbox-btn:hover {
+    background: rgba(36, 83, 255, 0.9);
+    border-color: var(--electric-blue);
+    transform: scale(1.08);
+  }
+
+  @media (max-width: 768px) {
+    .product-gallery-slider-wrap {
+      min-height: 400px;
+      border-radius: 14px;
+    }
+    .product-slide {
+      min-height: 400px;
+      max-height: 440px;
+      padding: 16px 10px;
+    }
+    .product-slide-img {
+      max-height: 380px;
+    }
+    .slider-nav-arrow {
+      width: 34px;
+      height: 34px;
+      opacity: 0.8;
+    }
+    .slider-arrow-prev {
+      left: 8px;
+    }
+    .slider-arrow-next {
+      right: 8px;
+    }
+    .product-top-bar {
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
+{% if prev_product or next_product %}
+<div class="product-top-bar">
+  <a href="/" class="product-top-bar-link" style="color: #9CA3AF;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    <span>TÜM DROP</span>
+  </a>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    {% if prev_product %}
+      <a href="/product/{{ prev_product['id'] }}" class="product-top-bar-link" title="{{ prev_product['name'] }}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>ÖNCEKİ PARÇA</span>
+      </a>
+    {% endif %}
+    {% if next_product %}
+      <a href="/product/{{ next_product['id'] }}" class="product-top-bar-link" title="{{ next_product['name'] }}">
+        <span>SONRAKİ PARÇA</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
 <div class="detail-box-wrap">
   <div class="detail-img-box" style="flex-direction: column; gap: 16px;">
-    <!-- Interactive Zoom Container -->
-    <div id="product-zoom-container" style="width: 100%; display: flex; align-items: center; justify-content: center; min-height: 480px; position: relative; border-radius: 18px; cursor: crosshair; overflow: hidden; background: #0B0D12;">
-      <!-- TEK VE NET T-SHIRT GÖRSELİ -->
-      <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}" id="main-product-img" loading="eager" decoding="async" style="width: 100%; max-width: 460px; height: auto; max-height: 480px; object-fit: contain; display: block; margin: 0 auto; transition: transform 0.25s ease, opacity 0.2s ease;">
-      
+    <!-- Interactive Photo Slider Container with Mobile Touch Swipe & Snap -->
+    <div class="product-gallery-slider-wrap" id="product-slider-container">
+      <div class="product-slider-track" id="product-slider-track">
+        {% for g_img in product['gallery_images'] %}
+          <div class="product-slide" data-index="{{ loop.index0 }}" data-src="{{ g_img['image_url'] }}">
+            <img 
+              src="{{ g_img['image_url'] }}" 
+              alt="{{ product['name'] }} - Görsel {{ loop.index }}" 
+              {% if loop.first %}id="main-product-img"{% endif %}
+              class="product-slide-img" 
+              loading="{% if loop.first %}eager{% else %}lazy{% endif %}" 
+              decoding="async">
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Slide Counter Badge (örn: 1 / 2) -->
+      {% if product['gallery_images'] and product['gallery_images']|length > 1 %}
+        <div class="slider-counter-badge" id="slider-counter-badge">
+          <span id="current-slide-num">1</span> / <span>{{ product['gallery_images']|length }}</span>
+        </div>
+      {% endif %}
+
+      <!-- Prev / Next Navigation Arrows -->
+      {% if product['gallery_images'] and product['gallery_images']|length > 1 %}
+        <button type="button" class="slider-nav-arrow slider-arrow-prev" id="slider-arrow-prev" aria-label="Önceki Görsel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="slider-nav-arrow slider-arrow-next" id="slider-arrow-next" aria-label="Sonraki Görsel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+
+      <!-- Mobile Touch Swipe Hint & Dot Indicators (Modern Pill Dots) -->
+      {% if product['gallery_images'] and product['gallery_images']|length > 1 %}
+        <div class="slider-dots-container" id="slider-dots-container">
+          {% for g_img in product['gallery_images'] %}
+            <button type="button" class="slider-dot {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}" aria-label="Görsel {{ loop.index }}"></button>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <!-- 1. 360° SPIN ROLL BUTONU (Sadece 360 Ayarı Açık Ürünlerde Görünür) -->
       {% if product.get('has_360') and product.get('back_image_url') %}
-      <button type="button" id="toggle-360-btn" title="Ön/Arka Çevir" style="position: absolute; bottom: 14px; left: 14px; background: rgba(10, 12, 18, 0.9); border: 1px solid var(--electric-blue); color: #FFFFFF; padding: 7px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; font-family: var(--font-mono); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; z-index: 5;">
+      <button type="button" id="toggle-360-btn" title="Ön/Arka Çevir" style="position: absolute; bottom: 14px; left: 14px; background: rgba(10, 12, 18, 0.9); border: 1px solid var(--electric-blue); color: #FFFFFF; padding: 7px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; font-family: var(--font-mono); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; z-index: 7;">
         <span>🔄 ÖN / ARKA ÇEVİR</span>
       </button>
       {% endif %}
 
       <!-- Click to enlarge hint button -->
-      <button type="button" id="open-lightbox-btn" title="Tam Ekran Büyüt" style="position: absolute; bottom: 14px; right: 14px; background: rgba(10, 12, 18, 0.85); border: 1px solid var(--border-hairline); color: #FFFFFF; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px); z-index: 5;">
+      <button type="button" id="open-lightbox-btn" title="Tam Ekran Büyüt" class="slider-lightbox-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -58,6 +368,7 @@
           <button 
             type="button" 
             class="gallery-thumb-btn {% if loop.first %}active{% endif %}" 
+            data-index="{{ loop.index0 }}"
             data-src="{{ g_img['image_url'] }}">
             <img src="{{ g_img['image_url'] }}" alt="Fotoğraf {{ loop.index }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
           </button>
@@ -66,11 +377,24 @@
     {% endif %}
   </div>
 
-  <!-- Full-Screen Lightbox Modal -->
-  <div id="image-lightbox-modal" style="display: none; position: fixed; inset: 0; background: rgba(5, 6, 8, 0.94); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);">
-    <button type="button" id="close-lightbox-btn" style="position: absolute; top: 24px; right: 28px; background: none; border: none; color: #FFF; font-size: 38px; cursor: pointer; line-height: 1; z-index: 10001; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&times;</button>
-    <div style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
-      <img src="{{ product['image_url'] }}" id="lightbox-img" alt="{{ product['name'] }}" style="max-width: 90vw; max-height: 88vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.9);">
+  <!-- Full-Screen Lightbox Modal with Swipe and Prev/Next -->
+  <div id="image-lightbox-modal" style="display: none; position: fixed; inset: 0; background: rgba(5, 6, 8, 0.96); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(12px);">
+    <button type="button" id="close-lightbox-btn" style="position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #FFF; width: 44px; height: 44px; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10001; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">&times;</button>
+    
+    {% if product['gallery_images'] and product['gallery_images']|length > 1 %}
+      <button type="button" id="lightbox-prev-btn" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(10, 12, 18, 0.85); border: 1px solid rgba(255,255,255,0.2); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10001; transition: all 0.2s;" aria-label="Önceki Görsel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button type="button" id="lightbox-next-btn" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(10, 12, 18, 0.85); border: 1px solid rgba(255,255,255,0.2); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10001; transition: all 0.2s;" aria-label="Sonraki Görsel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <div id="lightbox-counter" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(10, 12, 18, 0.85); border: 1px solid rgba(255,255,255,0.15); color: #FFF; font-family: var(--font-mono); font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 999px; z-index: 10001;">
+        <span id="lightbox-num">1</span> / <span>{{ product['gallery_images']|length }}</span>
+      </div>
+    {% endif %}
+
+    <div id="lightbox-touch-area" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+      <img src="{{ product['image_url'] }}" id="lightbox-img" alt="{{ product['name'] }}" style="max-width: 90vw; max-height: 86vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.95); transition: opacity 0.2s ease, transform 0.2s ease;">
     </div>
   </div>
 
@@ -608,8 +932,56 @@
   let selectedColor = "{{ product['color_name']|escape }}";
   let currentMainImage = "{{ product['image_url'] }}";
 
-  function switchMainGalleryImage(thumbBtn, newSrc) {
-    const mainImg = document.getElementById('main-product-img');
+  let currentSlideIndex = 0;
+
+  function scrollToSlide(index, smooth = true) {
+    const track = document.getElementById('product-slider-track');
+    const slides = document.querySelectorAll('.product-slide');
+    if (!track || slides.length === 0) return;
+    const clampedIndex = Math.max(0, Math.min(index, slides.length - 1));
+    currentSlideIndex = clampedIndex;
+    const slideWidth = track.clientWidth;
+    track.scrollTo({
+      left: clampedIndex * slideWidth,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+    updateActiveSlideUI(clampedIndex);
+  }
+
+  function updateActiveSlideUI(index) {
+    currentSlideIndex = index;
+    const slides = document.querySelectorAll('.product-slide');
+    const slideNumEl = document.getElementById('current-slide-num');
+    const lbNumEl = document.getElementById('lightbox-num');
+    if (slideNumEl) slideNumEl.textContent = (index + 1);
+    if (lbNumEl) lbNumEl.textContent = (index + 1);
+
+    // Update Dots
+    document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+
+    // Update Thumbnails
+    document.querySelectorAll('.gallery-thumb-btn').forEach((thumb, i) => {
+      const isActive = (i === index);
+      thumb.classList.toggle('active', isActive);
+      if (isActive) {
+        thumb.style.borderColor = 'var(--electric-blue)';
+        thumb.style.boxShadow = '0 0 12px rgba(36, 83, 255, 0.5)';
+        thumb.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+      } else {
+        thumb.style.borderColor = 'var(--border-hairline)';
+        thumb.style.boxShadow = 'none';
+      }
+    });
+
+    if (slides[index]) {
+      const src = slides[index].getAttribute('data-src');
+      if (src) currentMainImage = src;
+    }
+  }
+
+  function switchMainGalleryImage(thumbBtn, newSrc, slideIndex) {
     const card3D = document.getElementById('tshirt-3d-card');
     const toggle360Btn = document.getElementById('toggle-360-btn');
     if (card3D) card3D.style.transform = 'rotateY(0deg)';
@@ -619,21 +991,29 @@
       toggle360Btn.innerHTML = '<span>🔄 360° ARKA / ÖN ÇEVİR</span>';
     }
 
-    if (!mainImg || !newSrc) return;
-    mainImg.style.opacity = '0.3';
-    setTimeout(() => {
-      mainImg.src = newSrc;
-      currentMainImage = newSrc;
-      mainImg.style.opacity = '1';
-    }, 120);
+    if (newSrc) currentMainImage = newSrc;
 
-    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
-      btn.classList.remove('active');
-      btn.style.borderColor = 'var(--border-hairline)';
-    });
-    if (thumbBtn) {
-      thumbBtn.classList.add('active');
-      thumbBtn.style.borderColor = 'var(--electric-blue)';
+    if (typeof slideIndex === 'number') {
+      scrollToSlide(slideIndex);
+    } else if (newSrc) {
+      const slides = document.querySelectorAll('.product-slide');
+      let found = false;
+      slides.forEach((sl, idx) => {
+        if (sl.getAttribute('data-src') === newSrc) {
+          scrollToSlide(idx);
+          found = true;
+        }
+      });
+      if (!found) {
+        const mainImg = document.getElementById('main-product-img');
+        if (mainImg) {
+          mainImg.style.opacity = '0.3';
+          setTimeout(() => {
+            mainImg.src = newSrc;
+            mainImg.style.opacity = '1';
+          }, 120);
+        }
+      }
     }
   }
 
@@ -859,38 +1239,128 @@
       updateStarVisuals(checked ? parseInt(checked.value, 10) : 5);
     }
 
-    // --- FOTOĞRAF YAKINLAŞTIRMA (ZOOM) VE BÜYÜTME (LIGHTBOX) ---
-    const zoomContainer = document.getElementById('product-zoom-container');
-    const zoomImg = document.getElementById('main-product-img');
+    // --- FOTOĞRAF SLIDER (MOBİL TOUCH SWIPE, MOMENTUM & LIGHTBOX) ---
+    const sliderTrack = document.getElementById('product-slider-track');
+    const slides = document.querySelectorAll('.product-slide');
+    const totalSlides = slides.length;
+    const arrowPrev = document.getElementById('slider-arrow-prev');
+    const arrowNext = document.getElementById('slider-arrow-next');
+    const dotBtns = document.querySelectorAll('.slider-dot');
     const lightboxModal = document.getElementById('image-lightbox-modal');
     const lightboxImg = document.getElementById('lightbox-img');
     const openLightboxBtn = document.getElementById('open-lightbox-btn');
     const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+    const lbPrevBtn = document.getElementById('lightbox-prev-btn');
+    const lbNextBtn = document.getElementById('lightbox-next-btn');
+    const lbTouchArea = document.getElementById('lightbox-touch-area');
 
-    if (zoomContainer && zoomImg) {
-      zoomContainer.addEventListener('mousemove', function(e) {
-        const rect = zoomContainer.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        zoomImg.style.transformOrigin = `${x}% ${y}%`;
-        zoomImg.style.transform = 'scale(2.2)';
+    if (sliderTrack && totalSlides > 1) {
+      // 1. Momentum scroll-snap sync (RAF throttled for 120fps buttery smoothness)
+      let rafId = null;
+      sliderTrack.addEventListener('scroll', function() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          const slideWidth = sliderTrack.clientWidth;
+          if (slideWidth > 0) {
+            const index = Math.round(sliderTrack.scrollLeft / slideWidth);
+            if (index !== currentSlideIndex && index >= 0 && index < totalSlides) {
+              updateActiveSlideUI(index);
+            }
+          }
+        });
+      }, { passive: true });
+
+      // 2. Navigation Chevrons
+      if (arrowPrev) {
+        arrowPrev.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const prevIdx = currentSlideIndex > 0 ? currentSlideIndex - 1 : totalSlides - 1;
+          scrollToSlide(prevIdx);
+        });
+      }
+      if (arrowNext) {
+        arrowNext.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const nextIdx = currentSlideIndex < totalSlides - 1 ? currentSlideIndex + 1 : 0;
+          scrollToSlide(nextIdx);
+        });
+      }
+
+      // 3. Dot Clicks
+      dotBtns.forEach(dot => {
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const idx = parseInt(this.getAttribute('data-index'), 10) || 0;
+          scrollToSlide(idx);
+        });
       });
 
-      zoomContainer.addEventListener('mouseleave', function() {
-        zoomImg.style.transform = 'scale(1)';
-        zoomImg.style.transformOrigin = 'center center';
-      });
+      // 4. Touch Gestures Enhancement (Touch swipe detection for lightning-fast responsiveness)
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let isTouching = false;
 
-      // Mobilde dokunmatik zoom
-      zoomContainer.addEventListener('click', function(e) {
-        if (e.target.closest('#open-lightbox-btn')) return;
-        openLightbox();
+      sliderTrack.addEventListener('touchstart', function(e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchEndX = touchStartX;
+        isTouching = true;
+      }, { passive: true });
+
+      sliderTrack.addEventListener('touchmove', function(e) {
+        if (!isTouching || !e.touches || e.touches.length !== 1) return;
+        touchEndX = e.touches[0].clientX;
+      }, { passive: true });
+
+      sliderTrack.addEventListener('touchend', function(e) {
+        if (!isTouching) return;
+        isTouching = false;
+        const deltaX = touchStartX - touchEndX;
+        const deltaY = Math.abs((e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : touchStartY) - touchStartY);
+
+        // Horizontal swipe detected
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > deltaY * 1.2) {
+          if (deltaX > 0 && currentSlideIndex < totalSlides - 1) {
+            scrollToSlide(currentSlideIndex + 1);
+          } else if (deltaX < 0 && currentSlideIndex > 0) {
+            scrollToSlide(currentSlideIndex - 1);
+          }
+        }
+      }, { passive: true });
+    }
+
+    // 5. Desktop Mouse Hover Zoom (only on non-touch desktop screens > 992px)
+    if (window.innerWidth > 992) {
+      slides.forEach(slide => {
+        const img = slide.querySelector('.product-slide-img');
+        if (!img) return;
+        slide.addEventListener('mousemove', function(e) {
+          const rect = slide.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          img.style.transformOrigin = `${x}% ${y}%`;
+          img.style.transform = 'scale(1.85)';
+        });
+        slide.addEventListener('mouseleave', function() {
+          img.style.transform = 'scale(1)';
+          img.style.transformOrigin = 'center center';
+        });
       });
     }
 
-    function openLightbox() {
+    // 6. Lightbox Functions & Handlers
+    function openLightbox(index) {
+      if (typeof index === 'number') {
+        currentSlideIndex = index;
+      }
       if (lightboxModal && lightboxImg) {
-        lightboxImg.src = currentMainImage || (zoomImg ? zoomImg.src : '');
+        const activeSlide = slides[currentSlideIndex];
+        const activeSrc = activeSlide ? activeSlide.getAttribute('data-src') : currentMainImage;
+        lightboxImg.src = activeSrc;
+        const lbNumEl = document.getElementById('lightbox-num');
+        if (lbNumEl) lbNumEl.textContent = (currentSlideIndex + 1);
         lightboxModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       }
@@ -903,10 +1373,18 @@
       }
     }
 
+    // Slide click opens lightbox (if not clicking navigation)
+    slides.forEach((slide, sIdx) => {
+      slide.addEventListener('click', function(e) {
+        if (e.target.closest('.slider-nav-arrow') || e.target.closest('.slider-dots-container') || e.target.closest('#toggle-360-btn')) return;
+        openLightbox(sIdx);
+      });
+    });
+
     if (openLightboxBtn) {
       openLightboxBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        openLightbox();
+        openLightbox(currentSlideIndex);
       });
     }
 
@@ -916,13 +1394,57 @@
 
     if (lightboxModal) {
       lightboxModal.addEventListener('click', function(e) {
-        if (e.target === lightboxModal) closeLightbox();
+        if (e.target === lightboxModal || e.target === lbTouchArea) closeLightbox();
       });
     }
 
+    // Lightbox Chevrons
+    if (lbPrevBtn) {
+      lbPrevBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const prevIdx = currentSlideIndex > 0 ? currentSlideIndex - 1 : totalSlides - 1;
+        scrollToSlide(prevIdx);
+        openLightbox(prevIdx);
+      });
+    }
+    if (lbNextBtn) {
+      lbNextBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const nextIdx = currentSlideIndex < totalSlides - 1 ? currentSlideIndex + 1 : 0;
+        scrollToSlide(nextIdx);
+        openLightbox(nextIdx);
+      });
+    }
+
+    // Lightbox Touch Swipe
+    if (lbTouchArea && totalSlides > 1) {
+      let lbStartX = 0;
+      lbTouchArea.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length === 1) lbStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      lbTouchArea.addEventListener('touchend', function(e) {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        const diff = lbStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) {
+            const nextIdx = currentSlideIndex < totalSlides - 1 ? currentSlideIndex + 1 : 0;
+            scrollToSlide(nextIdx);
+            openLightbox(nextIdx);
+          } else {
+            const prevIdx = currentSlideIndex > 0 ? currentSlideIndex - 1 : totalSlides - 1;
+            scrollToSlide(prevIdx);
+            openLightbox(prevIdx);
+          }
+        }
+      }, { passive: true });
+    }
+
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && lightboxModal && lightboxModal.style.display === 'flex') {
-        closeLightbox();
+      if (lightboxModal && lightboxModal.style.display === 'flex') {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft' && lbPrevBtn) lbPrevBtn.click();
+        if (e.key === 'ArrowRight' && lbNextBtn) lbNextBtn.click();
       }
     });
 
@@ -945,11 +1467,12 @@
       toggle360Btn.addEventListener('click', function(e) {
         e.stopPropagation();
         isShowingBack = !isShowingBack;
-        if (zoomImg) {
-          zoomImg.style.opacity = '0.3';
+        const activeImg = (slides && slides[currentSlideIndex]) ? slides[currentSlideIndex].querySelector('.product-slide-img') : document.getElementById('main-product-img');
+        if (activeImg) {
+          activeImg.style.opacity = '0.3';
           setTimeout(() => {
-            zoomImg.src = isShowingBack ? backImgUrl : (currentMainImage || frontImgUrl);
-            zoomImg.style.opacity = '1';
+            activeImg.src = isShowingBack ? backImgUrl : (currentMainImage || frontImgUrl);
+            activeImg.style.opacity = '1';
           }, 120);
         }
 

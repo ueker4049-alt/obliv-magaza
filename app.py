@@ -692,6 +692,18 @@ def product_detail(product_id):
     rating_count = len(reviews)
     avg_rating = round(sum(r['rating'] for r in reviews) / rating_count, 1) if rating_count > 0 else 0
 
+    catalog_products = conn.execute(
+        "SELECT id, name FROM products WHERE is_active = 1 "
+        "ORDER BY CASE WHEN LOWER(color_name) = 'siyah' THEN 0 ELSE 1 END ASC, display_order ASC, id ASC"
+    ).fetchall()
+    prod_ids = [p['id'] for p in catalog_products]
+    prev_product = None
+    next_product = None
+    if product_id in prod_ids and len(prod_ids) > 1:
+        cur_idx = prod_ids.index(product_id)
+        prev_product = dict(catalog_products[cur_idx - 1])
+        next_product = dict(catalog_products[(cur_idx + 1) % len(prod_ids)])
+
     conn.close()
     return render_template(
         'product_detail.html',
@@ -700,7 +712,9 @@ def product_detail(product_id):
         has_purchased=has_purchased,
         has_already_reviewed=has_already_reviewed,
         rating_count=rating_count,
-        avg_rating=avg_rating
+        avg_rating=avg_rating,
+        prev_product=prev_product,
+        next_product=next_product
     )
 
 @app.route('/product/<int:product_id>/review', methods=['POST'])
