@@ -1,48 +1,39 @@
 @echo off
-chcp 65001 >nul
-title OBLIV WEAR - Site Güncelleme
+setlocal EnableDelayedExpansion
+title OBLIV WEAR - Otomatik Guncelleme
 cd /d "%~dp0"
 
 echo.
 echo ========================================================
-echo        OBLIV WEAR // OTOMATİK GÜNCELLEME SİSTEMİ
+echo        OBLIV WEAR // OTOMATIK GUNCELLEME SISTEMI
 echo ========================================================
 echo.
 
-echo [*] Tüm dosya değişiklikleri taranıyor ve ekleniyor...
+echo [*] Tum degisiklikler taranip ekleniyor...
 git add -A
 
-git status --porcelain > "%temp%\git_obliv_status.tmp"
-for %%R in ("%temp%\git_obliv_status.tmp") do if %%~zR equ 0 (
-    echo [i] Yeni bir değişiklik bulunamadı (Zaten en güncel halindesiniz).
-    goto push_step
-)
+echo [*] Guncelleme paketi olusturuluyor...
+set "commit_msg=Site Guncellemesi: %date% %time%"
+git commit -m "%commit_msg%" >nul 2>&1
 
-echo [*] Güncelleme paketi oluşturuluyor...
-set "commit_msg=Guncelleme: %date% %time%"
-git commit -m "%commit_msg%"
-
-:push_step
 echo.
-echo [*] Canlı sunucuya (GitHub & Render) gönderiliyor...
+echo [*] Canli sunucuya gonderiliyor...
 git push origin main
 
-if %errorlevel% equ 0 (
+if errorlevel 1 (
     echo.
     echo ========================================================
-    echo  [+] TEBRİKLER! GÜNCELLEMELER BAŞARIYLA SİTEYE GİTTİ!
-    echo  [+] oblivwear.com.tr 1-2 dakika içinde otomatik yenilenecektir.
+    echo  [!] HATA: Guncelleme gonderilemedi!
+    echo      Internet baglantinizi kontrol ediniz.
     echo ========================================================
 ) else (
     echo.
     echo ========================================================
-    echo  [!] Güncelleme gönderilirken bir sorun oluştu.
-    echo      Lütfen internet bağlantınızı kontrol ediniz.
+    echo  [+] TEBRIKLER! GUNCELLEMELER BASARIYLA SITE YE GITTI!
+    echo  [+] oblivwear.com.tr 1-2 dakika icinde otomatik yenilenir.
     echo ========================================================
 )
 
-if exist "%temp%\git_obliv_status.tmp" del "%temp%\git_obliv_status.tmp"
-
 echo.
-echo Pencereyi kapatmak için herhangi bir tuşa basınız...
+echo Pencereyi kapatmak icin herhangi bir tusa basiniz...
 pause >nul
