@@ -72,7 +72,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Big+Shoulders+Display:wght@800;900&family=Chivo:wght@700;900&family=Cinzel:wght@700;900&family=Cormorant+Garamond:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Epilogue:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&family=Kanit:wght@700;800;900&family=Lexend:wght@700;800;900&family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Rajdhani:wght@600;700;800&family=Russo+One&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800;900&family=Unbounded:wght@700;900&family=Urbanist:wght@600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/static/css/style.css?v=20261006_pro_buttons">
+  <link rel="stylesheet" href="/static/css/style.css?v=20261009_payment_badges_v1">
   <style>
     :root {
       --electric-blue: {{ settings.get('theme_color', '#FFFFFF') }};
@@ -526,28 +526,25 @@
             📍 Türkiye geneli kargo ile teslimat
           </div>
         </div>
-        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 12px; text-transform: uppercase;">
-          GÜVENLİ ÖDEME SEÇENEKLERİ
+        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 8px; text-transform: uppercase;">
+          GÜVENLİ ÖDEME ALTYAPISI
         </div>
-        <div style="margin-bottom: 6px;">
-          {% include 'payment_badges.html' %}
-        </div>
-        <div style="font-size: 11px; color: var(--text-dim); margin-top: 8px; font-family: var(--font-mono);">
-          🔒 256-Bit SSL • 3D Secure Korumalı
+        <div style="font-size: 12px; color: var(--text-dim); line-height: 1.6; font-family: var(--font-mono);">
+          🔒 Shopier ile 256-Bit SSL ve 3D Secure korumalı güvenli alışveriş.
         </div>
       </div>
     </div>
 
-    <!-- EN ALT TAB: GEÇERLİ KARTLAR & ÖDEME YÖNTEMLERİ -->
-    <div style="max-width: 1400px; margin: 0 auto; padding: 22px 24px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em;">
-        &copy; 2026 OBLIV. TÜM HAKLARI SAKLIDIR.
-      </div>
-      <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap;">
+    <!-- EN ALT TAB: TEK VE YATAY (SOLDAN SAĞA) ÖDEME KARTLARI ŞERİDİ -->
+    <div style="max-width: 1400px; margin: 0 auto; padding: 26px 20px 22px; border-top: 1px solid var(--border-hairline); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+      <!-- TEK SATIR: SOLDAN SAĞA TÜM KARTLAR -->
+      <div style="width: 100%; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; flex-wrap: wrap !important; gap: 8px !important;">
         {% include 'payment_badges.html' %}
       </div>
-      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em;">
-        OBLIV WEAR • OFFICIAL STORE
+
+      <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-family: var(--font-mono); font-size: 11px;">
+        <span style="color: var(--text-muted); letter-spacing: 0.1em;">&copy; 2026 OBLIV. TÜM HAKLARI SAKLIDIR.</span>
+        <span style="color: var(--text-dim); letter-spacing: 0.08em;">OBLIV WEAR • OFFICIAL STORE</span>
       </div>
     </div>
   </footer>
