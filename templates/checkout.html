@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Güvenli Ödeme | OBLIV{% endblock %}
+
+{% block content %}
+<section style="max-width: 1200px; margin: 40px auto 140px; padding: 0 24px;">
+  <div style="margin-bottom: 32px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">GÜVENLİ ÖDEME</span>
+    </div>
+    <h1 style="font-family: var(--font-display); font-size: 40px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase;">
+      SİPARİŞİ VE ÖDEMEYİ TAMAMLA
+    </h1>
+  </div>
+
+  <div class="checkout-wrap">
+    
+    <div style="background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 18px; padding: 36px;">
+      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)">
+        
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-hairline);">
+          <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; margin: 0; color: #FFFFFF;">
+            1. TESLİMAT VE İLETİŞİM BİLGİLERİ
+          </h2>
+          {% if not current_user %}
+            <span style="font-family: var(--font-mono); font-size: 11px; background: rgba(36, 83, 255, 0.15); border: 1px solid var(--border-blue); color: var(--electric-blue); padding: 4px 10px; border-radius: 999px; font-weight: 700;">
+              ⚡ MİSAFİR SİPARİŞİ (ÜYELİK ZORUNLU DEĞİL)
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="cust_name">Adınız ve Soyadınız</label>
+            <input type="text" id="cust_name" name="name" class="form-control" required value="{{ current_user['name'] if current_user else '' }}" placeholder="Adınız Soyadınız">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust_phone">Telefon Numarası</label>
+            <input type="tel" id="cust_phone" name="phone" class="form-control" required placeholder="05XX XXX XX XX">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cust_email">E-Posta Adresi</label>
+          <input type="email" id="cust_email" name="email" class="form-control" required value="{{ current_user['email'] if current_user else '' }}" placeholder="adiniz@email.com">
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="cust_city">Şehir</label>
+            <input type="text" id="cust_city" name="city" class="form-control" required placeholder="İstanbul">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust_address">Açık Teslimat Adresi</label>
+            <input type="text" id="cust_address" name="address" class="form-control" required placeholder="Mahalle, Sokak, No, Daire...">
+          </div>
+        </div>
+
+        
+        <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; margin: 36px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-hairline); color: #FFFFFF;">
+          2. ÖDEME YÖNTEMİNİ SEÇİN
+        </h2>
+
+        <!-- PAYMENT SELECTION -->
+        <div style="margin-bottom: 24px;">
+          <!-- SHOPIER OPTION -->
+          <label id="tab-label-shopier" style="display: flex; align-items: center; justify-content: space-between; background: #12141C; border: 2px solid var(--electric-blue); border-radius: 12px; padding: 18px 20px; cursor: pointer; transition: all 0.2s ease;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="radio" name="payment_choice" value="shopier" checked onchange="switchPaymentMethod('shopier')" style="accent-color: var(--electric-blue); width: 18px; height: 18px; cursor: pointer;">
+              <div>
+                <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px;">KREDİ / BANKA KARTI (SHOPIER)</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 2px;">3D Secure • Tek Çekim / Taksit İmkanı</div>
+              </div>
+            </div>
+          </label>
+
+          {% if iyzico_configured %}
+          <!-- IYZICO OPTION -->
+          <label id="tab-label-iyzico" style="display: flex; align-items: center; justify-content: space-between; background: #0E1015; border: 2px solid var(--border-hairline); border-radius: 12px; padding: 18px 20px; cursor: pointer; transition: all 0.2s ease; margin-top: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="radio" name="payment_choice" value="iyzico" onchange="switchPaymentMethod('iyzico')" style="accent-color: var(--electric-blue); width: 18px; height: 18px; cursor: pointer;">
+              <div>
+                <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px;">İYZİCO İLE ÖDE</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 2px;">3D Secure Kart Ödemesi</div>
+              </div>
+            </div>
+          </label>
+          {% endif %}
+        </div>
+
+        <!-- CONTAINER FOR INLINE IYZICO CHECKOUT FORM IF RETURNED -->
+        <div id="iyzico-checkout-container" style="display:none; margin-bottom: 24px;"></div>
+
+        <button type="submit" id="submit-order-btn" class="btn-drip-primary" style="width: 100%; justify-content: center; padding: 20px; font-size: 14px; letter-spacing: 1px;">
+          ÖDEMEYE GEÇ ➔
+        </button>
+      </form>
+    </div>
+
+    
+    <div style="background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 18px; padding: 36px; height: fit-content;">
+      <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-hairline);">
+        SİPARİŞ ÖZETİ
+      </h2>
+
+      <div id="checkout-items-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+        
+      </div>
+
+      <div style="border-top: 1px solid var(--border-hairline); padding-top: 18px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-dim);">
+          <span>Ara Toplam:</span>
+          <span id="co-subtotal" style="font-family: var(--font-mono); color: #FFFFFF; font-weight: 700;">0.00 ₺</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-dim);">
+          <span>Kargo:</span>
+          <span style="color: #FFFFFF; font-family: var(--font-mono); font-weight: 700;">Alıcıya Ait / Anlaşmalı Kargo</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-hairline); padding-top: 16px; margin-top: 6px;">
+          <span style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase;">TOPLAM TUTAR:</span>
+          <span id="co-total" style="font-family: var(--font-mono); font-size: 24px; font-weight: 800; color: var(--electric-blue);">0.00 ₺</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let activePaymentMethod = 'shopier';
+
+  function switchPaymentMethod(method) {
+    activePaymentMethod = method;
+    const labels = ['shopier', 'iyzico'];
+    labels.forEach(b => {
+      const labelEl = document.getElementById('tab-label-' + b);
+      if (labelEl) {
+        if (b === method) {
+          labelEl.style.borderColor = 'var(--electric-blue)';
+          labelEl.style.background = '#12141C';
+        } else {
+          labelEl.style.borderColor = 'var(--border-hairline)';
+          labelEl.style.background = '#0E1015';
+        }
+      }
+    });
+
+    const submitBtn = document.getElementById('submit-order-btn');
+    if (submitBtn) {
+      submitBtn.textContent = "ÖDEMEYE GEÇ ➔";
+    }
+  }
+
+  function renderCheckoutSummary() {
+    const list = document.getElementById('checkout-items-list');
+    const subtotalEl = document.getElementById('co-subtotal');
+    const totalEl = document.getElementById('co-total');
+    const submitBtn = document.getElementById('submit-order-btn');
+    const cart = getCart();
+    if (!list) return;
+    if (!cart || cart.length === 0) {
+      list.innerHTML = `
+        <div style="text-align:center; padding: 30px 10px; color: var(--text-muted);">
+          <div style="font-size: 24px; margin-bottom: 8px;">🛒</div>
+          Sepetinizde ürün bulunmuyor.<br>
+          <a href="/#catalog" style="color: var(--electric-blue); font-weight: 700; text-decoration: underline; margin-top: 8px; display: inline-block;">Koleksiyona Göz Atın</a>
+        </div>
+      `;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+      }
+      return;
+    }
+    let sum = 0;
+    let html = '';
+    cart.forEach(item => {
+      const itemSum = item.price * item.quantity;
+      sum += itemSum;
+      html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #131419; border: 1px solid var(--border-hairline); padding: 12px; border-radius: 8px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <img src="${item.imageUrl}" style="width: 44px; height: 44px; object-fit: contain; background: #080809; border-radius: 6px;">
+            <div>
+              <div style="font-family: var(--font-display); font-weight: 900; font-size: 16px; text-transform: uppercase;">${item.name}</div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">${item.size} • Adet: ${item.quantity}</div>
+            </div>
+          </div>
+          <div style="font-family: var(--font-mono); font-weight: 800; font-size: 14px; color: #FFFFFF;">${itemSum.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+        </div>
+      `;
+    });
+    list.innerHTML = html;
+    if (subtotalEl) subtotalEl.textContent = `${sum.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺`;
+    if (totalEl) totalEl.textContent = `${sum.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺`;
+  }
+
+  function formatCardNumber(input) {
+    let value = input.value.replace(/\D/g, '');
+    let formatted = '';
+    for (let i = 0; i < value.length; i++) {
+      if (i > 0 && i % 4 === 0) formatted += ' ';
+      formatted += value[i];
+    }
+    input.value = formatted;
+  }
+
+  async function handleCheckoutSubmit(e) {
+    e.preventDefault();
+    const cart = getCart();
+    if (!cart || cart.length === 0) {
+      alert("Sepetiniz boş. Lütfen önce bir ürün ekleyin.");
+      return;
+    }
+    const cardNumEl = document.getElementById('card_number');
+    const payload = {
+      name: document.getElementById('cust_name').value,
+      phone: document.getElementById('cust_phone').value,
+      email: document.getElementById('cust_email').value,
+      city: document.getElementById('cust_city').value,
+      address: document.getElementById('cust_address').value,
+      payment_method: activePaymentMethod,
+      cardNumber: cardNumEl ? cardNumEl.value : '',
+      cart: cart
+    };
+
+    const submitBtn = document.getElementById('submit-order-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "İŞLEM GERÇEKLEŞTİRİLİYOR...";
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (data.success) {
+        localStorage.removeItem('obliv_cart');
+        localStorage.removeItem('OBLIV99_cart');
+        localStorage.removeItem('duke_cart');
+
+        // Case 1: Live Iyzico Responsive Form injection
+        if (data.payment_type === 'iyzico' && data.checkout_form_content) {
+          submitBtn.style.display = 'none';
+          const container = document.getElementById('iyzico-checkout-container');
+          container.style.display = 'block';
+          container.innerHTML = data.checkout_form_content;
+          // Execute scripts in injected content
+          const scripts = container.querySelectorAll("script");
+          scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+          });
+          container.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+
+
+
+        // Case 2: Live Shopier Direct POST Redirect to shopier.com
+        if (data.payment_type === 'shopier' && data.shopier_url && data.shopier_params) {
+          submitBtn.textContent = "SHOPIER ÖDEME SAYFASINA YÖNLENDİRİLİYOR...";
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = data.shopier_url;
+          for (const [key, value] of Object.entries(data.shopier_params)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+          }
+          document.body.appendChild(form);
+          form.submit();
+          return;
+        }
+
+        if (data.order_number) {
+          window.location.href = `/order-success/${data.order_number}`;
+        }
+      } else {
+        alert("Ödeme Başlatılamadı: " + (data.message || "Lütfen ödeme bilgilerinizi kontrol edin."));
+        submitBtn.disabled = false;
+        switchPaymentMethod(activePaymentMethod);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("İşlem sırasında bir hata oluştu.");
+      submitBtn.disabled = false;
+      switchPaymentMethod(activePaymentMethod);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderCheckoutSummary);
+</script>
+{% endblock %}

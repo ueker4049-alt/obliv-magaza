@@ -1,0 +1,1705 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetim Paneli | {{ settings.get('store_name', 'OBLIV') }} Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+  .admin-nav-link {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    color: var(--text-dim);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+  }
+  .admin-nav-link:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .admin-nav-link.active {
+    color: #FFFFFF !important;
+    background: rgba(36, 83, 255, 0.18) !important;
+    border: 1px solid var(--electric-blue);
+    font-weight: 700;
+  }
+
+  /* Yönetim Paneli Modern ve Düzenli Tablo Sütunları */
+  .admin-table-wrap {
+    background: #0E1016;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow-x: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+  }
+  .admin-table th {
+    background: #141722;
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 800;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+  }
+  .admin-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+  }
+  .admin-table tr:hover td {
+    background: rgba(34, 76, 175, 0.04);
+  }
+
+  @media (max-width: 900px) {
+    .admin-layout {
+      grid-template-columns: 1fr;
+    }
+    aside {
+      border-right: none !important;
+      border-bottom: 1px solid var(--border-hairline) !important;
+      padding: 20px 16px !important;
+    }
+    main {
+      padding: 20px 16px !important;
+    }
+  }
+
+  /* Toggle Switch Styles */
+  .switch-slider-active-sales {
+    background-color: #10B981 !important;
+  }
+  .switch-slider-inactive-sales {
+    background-color: #EF4444 !important;
+  }
+  .switch-slider-active-wishlist {
+    background-color: #F59E0B !important;
+  }
+  .switch-slider-inactive-wishlist {
+    background-color: #374151 !important;
+  }
+  .switch-knob-on {
+    left: 26px !important;
+  }
+  .switch-knob-off {
+    left: 4px !important;
+  }
+  .sales-badge-active {
+    background: rgba(16,185,129,0.15);
+    color: #10B981;
+    border-color: rgba(16,185,129,0.4);
+  }
+  .sales-badge-inactive {
+    background: rgba(239,68,68,0.15);
+    color: #EF4444;
+    border-color: rgba(239,68,68,0.4);
+  }
+  .wishlist-badge-active {
+    background: rgba(245, 158, 11, 0.15);
+    color: #FBBF24;
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  .wishlist-badge-inactive {
+    background: rgba(107, 114, 128, 0.15);
+    color: #9CA3AF;
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  
+  <aside style="background: #0B0C0F; border-right: 1px solid var(--border-hairline); padding: 32px 20px;">
+    <div style="margin-bottom: 30px;">
+      <a href="/" target="_blank">
+        <img src="/static/images/obliv_animated.gif" alt="OBLIV" style="height: 30px; width: auto; margin-bottom: 8px;">
+      </a>
+      <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--electric-blue); font-weight: 800; text-transform: uppercase;">
+        KONTROL MERKEZİ (CMS)
+      </div>
+    </div>
+
+    <nav style="display: flex; flex-direction: column; gap: 4px;">
+      <a href="javascript:void(0)" class="admin-nav-link active" data-tab="overview" onclick="switchAdminTab('overview')">
+        📊 Genel İstatistikler
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="products" onclick="switchAdminTab('products')">
+        👕 Ürün Yönetimi ({{ products|length }})
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="add-product" onclick="switchAdminTab('add-product')">
+        ➕ Yeni Ürün & Fotoğraf Yükle
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="categories" onclick="switchAdminTab('categories')">
+        🏷️ Kategori Yönetimi ({{ categories|length }})
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="orders" onclick="switchAdminTab('orders')">
+        📦 Siparişler ({{ orders|length }})
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="support" onclick="switchAdminTab('support')" style="color: #60A5FA; font-weight: 700;">
+        💬 Destek Talepleri ({{ support_tickets|length }})
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="reviews" onclick="switchAdminTab('reviews')" style="color: #F59E0B; font-weight: 700;">
+        ⭐ Yorum Yönetimi ({{ reviews|length if reviews else 0 }})
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="settings" onclick="switchAdminTab('settings')">
+        ⚙️ Site & Metin Ayarları
+      </a>
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="users" onclick="switchAdminTab('users')">
+        👥 Müşteri & Üyeler ({{ users|length }})
+      </a>
+    </nav>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-hairline);">
+      <a href="/" target="_blank" class="btn-drip-outline" style="width: 100%; justify-content: center; font-size: 11px; padding: 12px;">
+        Mağazayı Aç ↗
+      </a>
+    </div>
+  </aside>
+
+  
+  <main style="padding: 40px; background: #080809; overflow-x: auto;">
+    
+    
+    <div id="section-overview" style="margin-bottom: 40px;">
+      <div style="margin-bottom: 24px;">
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">CANLI RAPOR</span>
+        <h1 style="font-family: var(--font-display); font-size: 36px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase;">
+          MAĞAZA PERFORMANSI
+        </h1>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+        <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Toplam Ciro</div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 800; color: #FFFFFF; margin: 8px 0;">{{ "%.2f"|format(total_revenue) }} ₺</div>
+          <div style="font-size: 12px; color: #10B981;">● Tüm ödemesi tamamlananlar</div>
+        </div>
+
+        <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Sipariş Sayısı</div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 800; color: #FFFFFF; margin: 8px 0;">{{ orders|length }}</div>
+          <div style="font-size: 12px; color: var(--text-dim);">Aktif ve tamamlanan siparişler</div>
+        </div>
+
+        <!-- Ziyaretçi İstatistikleri (Tekil & Sayfa Görüntüleme) -->
+        <div style="background: linear-gradient(135deg, rgba(36,83,255,0.12) 0%, #0F1014 100%); border: 1px solid var(--electric-blue); border-radius: 14px; padding: 24px; position: relative; overflow: hidden;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); text-transform: uppercase; font-weight: 800; letter-spacing: 0.1em;">
+              👁️ TOPLAM TEKİL ZİYARETÇİ
+            </div>
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981;"></span>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 900; color: #FFFFFF; margin: 8px 0;">
+            {{ visitor_stats.total_unique }}
+          </div>
+          <div style="display: flex; gap: 14px; font-size: 11px; color: var(--text-dim); font-family: var(--font-mono);">
+            <span>Bugün: <strong style="color: #60A5FA;">{{ visitor_stats.today_unique }} kişi</strong></span>
+            <span>•</span>
+            <span>Hit: <strong style="color: #F3F4F6;">{{ visitor_stats.total_views }} sayfa</strong></span>
+          </div>
+        </div>
+
+        <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Bugünkü Sayfa Hiti</div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 800; color: #A78BFA; margin: 8px 0;">{{ visitor_stats.today_views }}</div>
+          <div style="font-size: 12px; color: var(--text-dim);">Bugün incelenen sayfalar</div>
+        </div>
+
+        <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Yayındaki Modeller</div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 800; color: #FFFFFF; margin: 8px 0;">{{ products|length }}</div>
+          <div style="font-size: 12px; color: var(--electric-blue);">Aktif t-shirtler</div>
+        </div>
+
+        <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Kayıtlı Müşteri</div>
+          <div style="font-family: var(--font-mono); font-size: 32px; font-weight: 800; color: #FFFFFF; margin: 8px 0;">{{ users|length }}</div>
+          <div style="font-size: 12px; color: var(--text-dim);">Veritabanındaki hesaplar</div>
+        </div>
+      </div>
+
+      <!-- Canlı Ziyaretçi & Trafik Tablosu -->
+      <div style="margin-top: 30px; background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 16px;">🌐</span>
+            <h3 style="font-family: var(--font-mono); font-size: 13px; font-weight: 800; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.08em; margin: 0;">
+              SON CANLI ZİYARETÇİ HAREKETLERİ (CANLI GÜNLÜK)
+            </h3>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); background: #181A22; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-hairline);">
+            Anlık Takip Aktif
+          </span>
+        </div>
+
+        {% if visitor_stats.recent_visits %}
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; font-family: var(--font-mono);">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim);">
+                  <th style="padding: 10px 14px;">ZAMAN</th>
+                  <th style="padding: 10px 14px;">ZİYARET EDİLEN SAYFA</th>
+                  <th style="padding: 10px 14px;">ZİYARETÇİ KODU</th>
+                  <th style="padding: 10px 14px;">CİHAZ / TARAYICI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in visitor_stats.recent_visits %}
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <td style="padding: 10px 14px; color: #9CA3AF; white-space: nowrap;">
+                      {{ v['created_at'] }}
+                    </td>
+                    <td style="padding: 10px 14px; font-weight: 700; color: var(--electric-blue);">
+                      {{ v['path'] }}
+                    </td>
+                    <td style="padding: 10px 14px;">
+                      <span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; color: #E5E7EB; font-size: 11px;">
+                        #{{ v['short_ip'] }}
+                      </span>
+                    </td>
+                    <td style="padding: 10px 14px; color: var(--text-dim); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      {{ v['user_agent'] or 'Bilinmiyor' }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="padding: 24px; text-align: center; color: var(--text-dim); font-size: 13px;">
+            Henüz kayıtlı ziyaretçi hareketi bulunmuyor. Sayfaları gezdikçe burada anında listelenecektir.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    
+    <div id="section-add-product" style="margin-bottom: 50px; display: none;">
+      <div style="margin-bottom: 24px;">
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">HIZLI EKLEME</span>
+        <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase;">
+          YENİ T-SHIRT MODELİ & FOTOĞRAF YÜKLE
+        </h2>
+      </div>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 18px; padding: 36px; max-width: 900px;">
+        <form method="POST" action="/admin/products/add" enctype="multipart/form-data">
+          
+          
+          <div style="background: #141720; border: 1px solid var(--electric-blue); border-radius: 12px; padding: 20px; margin-bottom: 28px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 800; color: #FFFFFF; text-transform: uppercase;">
+                📸 ÜRÜN FOTOĞRAFI YÜKLEME ALANI
+              </span>
+              <span style="background: var(--electric-blue); color: #FFFFFF; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                ÖNERİLEN ÇÖZÜNÜRLÜK: 1200 x 1360 PX (VEYA 1:1 KARE 1200 x 1200 PX)
+              </span>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px;">
+              • <strong>Desteklenen Formatlar:</strong> PNG, JPG, JPEG, WEBP, SVG<br>
+              • <strong>İdeal Oran:</strong> <strong>1200 x 1360 piksel</strong> (veya en az <strong>800 x 800 px</strong>).<br>
+              • <strong>İpucu:</strong> Arka planı koyu/mat olan veya şeffaf PNG fotoğraflar sitede kusursuz görünür.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; margin-bottom: 16px;">
+              <div>
+                <label class="form-label">Ana / Kapak Fotoğrafı Seçin</label>
+                <input type="file" name="product_photo" accept="image/*" class="form-control" style="padding: 10px;">
+              </div>
+              <div>
+                <label class="form-label">veya Hazır Şablon Kullanın</label>
+                <select name="preset_image" class="form-control">
+                  <option value="/static/images/tshirt_black.svg">OBLIV Siyah Heavyweight T-Shirt</option>
+                  <option value="/static/images/tshirt_white.svg">OBLIV Kırık Beyaz Heavyweight T-Shirt</option>
+                  <option value="/static/images/tshirt_sage.svg">OBLIV Adaçayı Heavyweight T-Shirt</option>
+                  <option value="/static/images/tshirt_taupe.svg">OBLIV Vizon Heavyweight T-Shirt</option>
+                  <option value="/static/images/tshirt_steel.svg">OBLIV Çelik Mavi Heavyweight T-Shirt</option>
+                  <option value="/static/images/tshirt_terracotta.svg">OBLIV Kiremit Heavyweight T-Shirt</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 360 Dönüş İçin Tişörtün Arka Yüzü Fotoğrafı -->
+            <div style="background: rgba(36, 83, 255, 0.06); border: 1px solid rgba(36, 83, 255, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+              <label class="form-label" style="color: #FFFFFF; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <span>🔄</span> Tişörtün Arka Yüzü Fotoğrafı (360° Çevirme İçin)
+              </label>
+              <input type="file" name="back_photo" accept="image/*" class="form-control" style="padding: 10px;">
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+                * 360° döndürme tıklandığında kapak fotoğrafı kendi ekseninde dönerek tişörtün bu arka yüzünü gösterir.
+              </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px dashed var(--border-blue); border-radius: 10px; padding: 14px;">
+              <label class="form-label" style="color: #FFFFFF; font-weight: 700; margin-bottom: 4px; display: block;">
+                📸 Çoklu Ek Fotoğraflar (Galeri için birden fazla fotoğraf seçebilirsiniz)
+              </label>
+              <input type="file" name="extra_photos" accept="image/*" multiple class="form-control" style="padding: 10px;">
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+                * Ctrl tuşuna basılı tutarak birden fazla fotoğraf seçebilirsiniz. Bu fotoğraflar ürün detayında galeri olarak sıralanır.
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Ürün / Model İsmi</label>
+              <input type="text" name="name" class="form-control" required placeholder="Örn: OBLIV Boxy Fit Siyah T-Shirt">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kategori</label>
+              <select name="category" class="form-control">
+                {% if categories %}
+                  {% for cat in categories %}
+                    <option value="{{ cat['name'] }}">{{ cat['name'] }}</option>
+                  {% endfor %}
+                {% else %}
+                  <option value="T-Shirt">T-Shirt</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Fiyat (₺)</label>
+              <input type="number" step="0.01" name="price" class="form-control" required placeholder="849.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Eski Fiyat (İndirim Göstermek İçin)</label>
+              <input type="number" step="0.01" name="old_price" class="form-control" placeholder="990.00">
+            </div>
+          </div>
+
+          
+          <div style="background: #11141C; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+            <label class="form-label" style="color: var(--electric-blue); font-weight: 800; margin-bottom: 12px; display: block;">
+              📦 BEDENLERE GÖRE AYRI STOK ADETLERİ
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 10px; color: #FFFFFF;">S BEDEN</label>
+                <input type="number" name="stock_s" class="form-control" value="15" min="0" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 10px; color: #FFFFFF;">M BEDEN</label>
+                <input type="number" name="stock_m" class="form-control" value="25" min="0" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 10px; color: #FFFFFF;">L BEDEN</label>
+                <input type="number" name="stock_l" class="form-control" value="20" min="0" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 10px; color: #FFFFFF;">XL BEDEN</label>
+                <input type="number" name="stock_xl" class="form-control" value="10" min="0" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- RENK VE VARYASYONLAR ALANI -->
+          <div style="background: #11141C; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <label class="form-label" style="color: var(--electric-blue); font-weight: 800; margin-bottom: 0;">
+                🎨 RENK SEÇENEKLERİ & VARYASYONLAR
+              </label>
+              <button type="button" onclick="addAdminAddColorRow()" style="background: rgba(36,83,255,0.15); border: 1px solid var(--electric-blue); color: #FFF; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; cursor: pointer;">
+                + Ek Renk Ekle
+              </button>
+            </div>
+
+            <!-- Ana Renk -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; align-items: end;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Ana Renk Adı</label>
+                <input type="text" name="color_name" class="form-control" required placeholder="Örn: Mat Grafit Siyah">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Renk Kodu</label>
+                <input type="color" name="color_hex" class="form-control" value="#121316" style="height: 48px; padding: 2px;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Etiket / Rozet</label>
+                <input type="text" name="badge" class="form-control" placeholder="YENİ DROP">
+              </div>
+            </div>
+
+            <!-- Ek Renkler Container -->
+            <div id="admin-add-extra-colors-container"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ürün Açıklaması</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Modelin detayları, kumaş özellikleri ve albüm teması..."></textarea>
+          </div>
+
+          <div style="background: rgba(36, 83, 255, 0.08); border: 1px solid rgba(36, 83, 255, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-weight: 700; font-size: 14px; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                <span>⭐</span> Ürünü Öne Çıkar (Anasayfada Göster)
+              </div>
+              <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+                Bu seçenek açıldığında ürün anasayfadaki "Öne Çıkan Ürünler" vitrininde yer alır.
+              </div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+              <input type="checkbox" name="is_featured" value="1" style="opacity: 0; width: 0; height: 0;" id="isFeaturedAddToggle">
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #242731; transition: .3s; border-radius: 26px; border: 1px solid var(--border-hairline);" id="isFeaturedAddSlider"></span>
+            </label>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-weight: 700; font-size: 14px; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                <span>🔄</span> 360° Döndürme Modunu Aktif Et
+              </div>
+              <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+                Sadece bu özellik açıldığında ürün sayfasında 360° döndürme butonu gözükür (açık olmayan ürünlerde kötü durmaması için gizlenir).
+              </div>
+            </div>
+            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+              <input type="checkbox" name="has_360" value="1" style="opacity: 0; width: 0; height: 0;" id="has360AddToggle">
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #242731; transition: .3s; border-radius: 26px; border: 1px solid var(--border-hairline);" id="has360AddSlider"></span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-drip-primary" style="padding: 16px 36px;">
+            ÜRÜNÜ YAYINA AL VE KAYDET →
+          </button>
+        </form>
+      </div>
+    </div>
+
+    
+    <div id="section-products" style="margin-bottom: 50px; display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase;">
+          TÜM KIYAFET & GİYİM MODELLERİ (FOTOĞRAF VE DETAY DÜZENLE)
+        </h2>
+        <button class="btn-drip-primary" style="font-size: 11px; padding: 10px 20px;" onclick="switchAdminTab('add-product')">
+          + Yeni Model & Fotoğraf Ekle
+        </button>
+      </div>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+              <th style="padding: 16px 20px; width: 90px; color: var(--electric-blue);">↕ Sıra</th>
+              <th style="padding: 16px 20px;">Fotoğraf</th>
+              <th style="padding: 16px 20px;">Model Adı</th>
+              <th style="padding: 16px 20px;">Kategori</th>
+              <th style="padding: 16px 20px;">Renk</th>
+              <th style="padding: 16px 20px;">Fiyat</th>
+              <th style="padding: 16px 20px;">Stok</th>
+              <th style="padding: 16px 20px; color: #F59E0B;">📋 İstek Listesi</th>
+              <th style="padding: 16px 20px; color: var(--electric-blue);">★ Öne Çıkar</th>
+              <th style="padding: 16px 20px;">İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prod in products %}
+              <tr style="border-bottom: 1px solid var(--border-hairline);" id="prod-row-{{ prod['id'] }}">
+                <td style="padding: 14px 20px; width: 90px;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input 
+                      type="number" 
+                      value="{{ prod['display_order'] or 0 }}" 
+                      min="0"
+                      class="product-order-input"
+                      data-product-id="{{ prod['id'] }}"
+                      style="width: 54px; background: #0A0C10; border: 1px solid var(--border-subtle); color: #60A5FA; font-family: var(--font-mono); font-weight: 800; font-size: 13px; text-align: center; padding: 6px 4px; border-radius: 8px; outline: none; transition: all 0.2s;"
+                      title="Değiştirip Enter'a basın veya dışına tıklayın"
+                      onchange="updateProductDisplayOrder(this)"
+                      onfocus="this.style.borderColor='var(--electric-blue)'; this.style.boxShadow='0 0 10px rgba(36,83,255,0.4)';"
+                      onblur="this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='none';">
+                  </div>
+                </td>
+                <td style="padding: 14px 20px; width: 70px;">
+                  <img src="{{ prod['image_url'] }}" alt="{{ prod['name'] }}" style="width: 50px; height: 50px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border-hairline);">
+                </td>
+                <td style="padding: 14px 20px;">
+                  <strong style="color: #FFFFFF; font-family: var(--font-display); font-size: 18px; letter-spacing: 0.02em;">{{ prod['name'] }}</strong>
+                  <div style="font-family: var(--font-mono); font-size: 10px; color: var(--electric-blue);">{{ prod['image_url'] }}</div>
+                </td>
+                <td style="padding: 14px 20px;">{{ prod['category'] }}</td>
+                <td style="padding: 14px 20px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="admin-color-dot" data-hex="{{ prod['color_hex'] }}" style="width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid #FFF;"></span>
+                    <span>{{ prod['color_name'] }}</span>
+                  </div>
+                </td>
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 700;">{{ "%.2f"|format(prod['price']) }} ₺</td>
+                <td style="padding: 14px 20px; font-weight: 700; color: #10B981;">{{ prod['stock'] }} adet</td>
+                <td style="padding: 14px 20px;">
+                  {% if prod['wishlist_count'] and prod['wishlist_count'] > 0 %}
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4);">
+                      <span style="font-size: 13px;">🔥</span>
+                      <span style="font-family: var(--font-mono); font-weight: 800; font-size: 12px; color: #FBBF24;">
+                        {{ prod['wishlist_count'] }} kişi bekliyor
+                      </span>
+                    </div>
+                  {% else %}
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-hairline);">
+                      <span style="font-size: 13px;">🔥</span>
+                      <span style="font-family: var(--font-mono); font-weight: 800; font-size: 12px; color: var(--text-dim);">
+                        0 kişi bekliyor
+                      </span>
+                    </div>
+                  {% endif %}
+                </td>
+                <td style="padding: 14px 20px;">
+                  {% if prod['is_featured'] %}
+                    <button
+                      type="button"
+                      class="featured-toggle-btn"
+                      data-product-id="{{ prod['id'] }}"
+                      data-featured="1"
+                      style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.25s; border: 1px solid var(--electric-blue); background: rgba(36,83,255,0.2); color: #7EB3FF;"
+                      title="Anasayfada Göster / Gizle">
+                      <span style="font-size: 13px;">★</span>
+                      <span class="featured-btn-label">ÖNE ÇIKARILDI</span>
+                    </button>
+                  {% else %}
+                    <button
+                      type="button"
+                      class="featured-toggle-btn"
+                      data-product-id="{{ prod['id'] }}"
+                      data-featured="0"
+                      style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.25s; border: 1px solid var(--border-hairline); background: #0F1014; color: var(--text-dim);"
+                      title="Anasayfada Göster / Gizle">
+                      <span style="font-size: 13px;">★</span>
+                      <span class="featured-btn-label">ÖNE ÇIKAR</span>
+                    </button>
+                  {% endif %}
+                </td>
+                <td style="padding: 14px 20px;">
+                  <div style="display: flex; gap: 8px;">
+                    <a href="/admin/products/edit/{{ prod['id'] }}" class="btn-drip-outline" style="padding: 6px 14px; font-size: 11px;">
+                      Düzenle ✎
+                    </a>
+                    <form method="POST" action="/admin/products/delete" onsubmit="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">
+                      <input type="hidden" name="product_id" value="{{ prod['id'] }}">
+                      <button type="submit" style="background: #4A1717; border: 1px solid #751F1F; color: #FFA3A3; padding: 6px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; cursor: pointer;">
+                        Sil
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    
+    <div id="section-categories" style="margin-bottom: 50px; display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">MAĞAZA KATEGORİLERİ</span>
+          <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase;">
+            KATEGORİ YÖNETİMİ
+          </h2>
+        </div>
+      </div>
+
+      
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px; margin-bottom: 30px;">
+        <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px;">
+          + Yeni Kategori Ekle
+        </h3>
+        <form method="POST" action="/admin/categories/add" style="display: flex; gap: 14px; max-width: 600px;">
+          <input type="text" name="category_name" class="form-control" placeholder="Örn: Hoodie, Ceket, Eşofman..." required>
+          <button type="submit" class="btn-drip-primary" style="white-space: nowrap; padding: 12px 24px;">
+            Kategori Ekle +
+          </button>
+        </form>
+      </div>
+
+      
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden; max-width: 800px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+              <th style="padding: 16px 20px;">ID</th>
+              <th style="padding: 16px 20px;">Kategori Adı</th>
+              <th style="padding: 16px 20px;">Slug / URL</th>
+              <th style="padding: 16px 20px;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+              <tr style="border-bottom: 1px solid var(--border-hairline);">
+                <td style="padding: 14px 20px; font-family: var(--font-mono);">#{{ cat['id'] }}</td>
+                <td style="padding: 14px 20px; font-weight: 700; color: #FFFFFF; font-size: 15px;">{{ cat['name'] }}</td>
+                <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--text-dim);">{{ cat['slug'] }}</td>
+                <td style="padding: 14px 20px;">
+                  <form method="POST" action="/admin/categories/delete" onsubmit="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
+                    <input type="hidden" name="category_id" value="{{ cat['id'] }}">
+                    <button type="submit" style="background: #4A1717; border: 1px solid #751F1F; color: #FFA3A3; padding: 6px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; cursor: pointer;">
+                      Sil
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" style="padding: 30px; text-align: center; color: var(--text-muted);">
+                  Henüz kategori eklenmedi. Yukarıdaki formdan ekleyebilirsiniz.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+    <div id="section-orders" style="margin-bottom: 50px; display: none;">
+      <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase; margin-bottom: 24px;">
+        GELEN SİPARİŞLER VE KARGO DURUMU
+      </h2>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+              <th style="padding: 16px 20px;">Sipariş Kodu</th>
+              <th style="padding: 16px 20px;">Müşteri</th>
+              <th style="padding: 16px 20px;">Adres / Şehir</th>
+              <th style="padding: 16px 20px;">Tutar</th>
+              <th style="padding: 16px 20px;">Ödeme Yöntemi / Durumu</th>
+              <th style="padding: 16px 20px;">Kargo Durumu</th>
+              <th style="padding: 16px 20px;">Kargoyu Güncelle</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ord in orders %}
+              <tr style="border-bottom: 1px solid var(--border-hairline);">
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 800; color: #FFFFFF;">
+                  #{{ ord['order_number'] }}
+                </td>
+                <td style="padding: 14px 20px;">
+                  <strong>{{ ord['customer_name'] }}</strong>
+                  <div style="font-size: 11px; color: var(--text-dim);">{{ ord['customer_phone'] }}</div>
+                </td>
+                <td style="padding: 14px 20px;">
+                  <strong>{{ ord['city'] }}</strong>
+                  <div style="font-size: 11px; color: var(--text-dim);">{{ ord['shipping_address'] }}</div>
+                </td>
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 800; color: var(--electric-blue);">
+                  {{ "%.2f"|format(ord['total_amount']) }} ₺
+                </td>
+                <td style="padding: 14px 20px;">
+                  <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #FFF; margin-bottom: 4px;">
+                    {{ ord['card_last4'] or 'HAVALE/FAST' }}
+                  </div>
+                  {% if 'Ödendi' in ord['payment_status'] %}
+                    <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; background: #064E3B; color: #34D399;">
+                      {{ ord['payment_status'] }}
+                    </span>
+                  {% else %}
+                    <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; background: #78350F; color: #FBBF24;">
+                      {{ ord['payment_status'] }}
+                    </span>
+                  {% endif %}
+                  {% if 'Bekleniyor' in ord['payment_status'] %}
+                    <form method="POST" action="/admin/orders/confirm-payment" style="display: inline-block; margin-top: 6px;">
+                      <input type="hidden" name="order_id" value="{{ ord['id'] }}">
+                      <button type="submit" style="background: #10B981; color: #000; border: none; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        ✓ Havaleyi Onayla
+                      </button>
+                    </form>
+                  {% endif %}
+                </td>
+                <td style="padding: 14px 20px;">
+                  <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; background: #181E30; color: var(--electric-blue); border: 1px solid var(--border-blue); margin-bottom: 4px;">
+                    {{ ord['order_status'] }}
+                  </span>
+                </td>
+                <td style="padding: 14px 20px;">
+                  <form method="POST" action="/admin/orders/update-status" style="display: flex; gap: 6px;">
+                    <input type="hidden" name="order_id" value="{{ ord['id'] }}">
+                    <select name="status" class="form-control" style="padding: 4px 8px; font-size: 11px; width: auto;">
+                      <option value="Hazırlanıyor" {% if ord['order_status'] == 'Hazırlanıyor' %}selected{% endif %}>Hazırlanıyor</option>
+                      <option value="Kargoya Verildi" {% if ord['order_status'] == 'Kargoya Verildi' %}selected{% endif %}>Kargoya Verildi</option>
+                      <option value="Teslim Edildi" {% if ord['order_status'] == 'Teslim Edildi' %}selected{% endif %}>Teslim Edildi</option>
+                      <option value="İptal Edildi" {% if ord['order_status'] == 'İptal Edildi' %}selected{% endif %}>İptal Edildi</option>
+                    </select>
+                    <button type="submit" class="btn-drip-outline" style="padding: 4px 10px; font-size: 10px;">Kaydet</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="6" style="padding: 30px; text-align: center; color: var(--text-dim);">Henüz sipariş bulunmuyor.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+    <div id="section-settings" style="margin-bottom: 50px; display: none;">
+      <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase; margin-bottom: 24px;">
+        MAĞAZA VE METİN AYARLARI
+      </h2>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 18px; padding: 36px; max-width: 800px;">
+        <form method="POST" action="/admin/settings/update">
+          <!-- ============================================== -->
+          <!-- SATIN ALIM & İSTEK LİSTESİ MODU KONTROLÜ       -->
+          <!-- ============================================== -->
+          <div style="background: #12141C; border: 1.5px solid var(--electric-blue); border-radius: 14px; padding: 22px; margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <strong style="font-family: var(--font-mono); font-size: 13px; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px;">
+                  <span>🛒</span> SATIŞ VE ÖDEME ALIMI KONTROLÜ
+                </strong>
+                <p style="font-size: 12px; color: var(--text-dim); margin: 4px 0 0;">
+                  Satın alımları kapattığınızda sitede ödeme sayfaları devre dışı kalır. Müşteriler satın alamaz.
+                </p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 52px; height: 30px; margin: 0; cursor: pointer;">
+                <input type="checkbox" name="sales_enabled" value="1" style="position: absolute; opacity: 0; width: 100%; height: 100%; top: 0; left: 0; margin: 0; cursor: pointer; z-index: 2;" id="salesEnabledToggle" {% if site_settings.get('sales_enabled', '1') == '1' %}checked{% endif %} onchange="updateSalesToggleUI(this)">
+                <span id="salesEnabledSlider" class="{% if site_settings.get('sales_enabled', '1') == '1' %}switch-slider-active-sales{% else %}switch-slider-inactive-sales{% endif %}" style="position: absolute; pointer-events: none; top: 0; left: 0; right: 0; bottom: 0; transition: .3s; border-radius: 30px;">
+                  <span id="salesEnabledKnob" class="{% if site_settings.get('sales_enabled', '1') == '1' %}switch-knob-on{% else %}switch-knob-off{% endif %}" style="position: absolute; height: 22px; width: 22px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></span>
+                </span>
+              </label>
+            </div>
+            
+            <div id="sales-status-badge" class="{% if site_settings.get('sales_enabled', '1') == '1' %}sales-badge-active{% else %}sales-badge-inactive{% endif %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 800; border: 1px solid transparent; margin-bottom: 20px;">
+              <span>●</span> <span id="sales-status-text">{% if site_settings.get('sales_enabled', '1') == '1' %}SATIŞLAR AÇIK (ÖDEMELER VE SİPARİŞ ALIMI AKTİF){% else %}SATIŞLAR KAPALI (ÖDEMELER VE CHECKOUT KİLİTLİ){% endif %}</span>
+            </div>
+
+            <!-- İstek Listesi Toggle -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="font-family: var(--font-mono); font-size: 13px; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px;">
+                  <span>📋</span> "SEPETE EKLE" YERİNE "İSTEK LİSTESİ" MODU
+                </strong>
+                <p style="font-size: 12px; color: var(--text-dim); margin: 4px 0 0;">
+                  Açıldığında sitedeki "SEPETE EKLE" butonları <strong>"İSTEK LİSTESİNE EKLE"</strong> olur ve checkout/ödeme kilitlenir. Kaç kişinin hangi ürünü beklediğini aşağıdaki ürün tablosundan canlı görebilirsiniz.
+                </p>
+                <div id="wishlist-status-badge" class="{% if site_settings.get('wishlist_mode') == '1' %}wishlist-badge-active{% else %}wishlist-badge-inactive{% endif %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; border: 1px solid transparent; margin-top: 8px;">
+                  <span>●</span> <span id="wishlist-status-text">{% if site_settings.get('wishlist_mode') == '1' %}İSTEK LİSTESİ MODU AKTİF (ÖDEME & CHECKOUT KAPALI){% else %}İSTEK LİSTESİ KAPALI (NORMAL SEPET & ÖDEME MODU){% endif %}</span>
+                </div>
+              </div>
+              <label style="position: relative; display: inline-block; width: 52px; height: 30px; margin: 0; cursor: pointer;">
+                <input type="checkbox" name="wishlist_mode" value="1" style="position: absolute; opacity: 0; width: 100%; height: 100%; top: 0; left: 0; margin: 0; cursor: pointer; z-index: 2;" id="wishlistModeToggle" {% if site_settings.get('wishlist_mode') == '1' %}checked{% endif %} onchange="updateWishlistToggleUI(this)">
+                <span id="wishlistModeSlider" class="{% if site_settings.get('wishlist_mode') == '1' %}switch-slider-active-wishlist{% else %}switch-slider-inactive-wishlist{% endif %}" style="position: absolute; pointer-events: none; top: 0; left: 0; right: 0; bottom: 0; transition: .3s; border-radius: 30px;">
+                  <span id="wishlistModeKnob" class="{% if site_settings.get('wishlist_mode') == '1' %}switch-knob-on{% else %}switch-knob-off{% endif %}" style="position: absolute; height: 22px; width: 22px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mağaza Marka Adı</label>
+            <input type="text" name="store_name" class="form-control" value="{{ site_settings.get('store_name', 'OBLIV') }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kayan Duyuru Bandı Metni</label>
+            <input type="text" name="announcement" class="form-control" value="{{ site_settings.get('announcement', '') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ana Sayfa Büyük Başlık</label>
+            <input type="text" name="hero_title" class="form-control" value="{{ site_settings.get('hero_title', '') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">İletişim E-Posta</label>
+            <input type="email" name="contact_email" class="form-control" value="{{ site_settings.get('contact_email', 'oblivwear@gmail.com') }}">
+          </div>
+
+          <!-- ============================================== -->
+          <!-- TEMA RENGİ VE LOGO SENKRONİZASYON AYARI        -->
+          <!-- ============================================== -->
+          <div style="background: #141720; border: 1px solid var(--electric-blue); border-radius: 14px; padding: 24px; margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <strong style="font-family: var(--font-mono); font-size: 13px; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.08em;">
+                  🎨 SİTE TEMA RENGİ & LOGO UYUMU
+                </strong>
+                <p style="font-size: 12px; color: var(--text-dim); margin: 4px 0 0;">
+                  Seçtiğiniz renk tüm sitedeki butonlar, neon vurgular ve <strong>OBLIV logosunun mavi 'V' simgesi ile animasyonlu logosuna</strong> anında uygulanır.
+                </p>
+              </div>
+              <span id="current-theme-badge" data-theme="{{ site_settings.get('theme_color', '#2453FF') }}" style="color: #FFFFFF; font-family: var(--font-mono); font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 999px; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">
+                {{ site_settings.get('theme_color', '#2453FF') }}
+              </span>
+            </div>
+
+            <!-- Curated Luxury Presets -->
+            <label class="form-label" style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">ÖZEL SEÇİLMİŞ MARKA RENK PALETLERİ (TIKLAYINCA SEÇİLİR):</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px;">
+              <button type="button" class="theme-preset-btn" data-color="#2453FF" onclick="selectThemePreset('#2453FF', 'OBLIV Kobalt Mavi (Orijinal)')" style="background: #0E1017; border: 1px solid rgba(36,83,255,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #2453FF; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Kobalt Mavi</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#FF3B30" onclick="selectThemePreset('#FF3B30', 'Alev Kırmızı (Drip Red)')" style="background: #0E1017; border: 1px solid rgba(255,59,48,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #FF3B30; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Alev Kırmızı</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#10B981" onclick="selectThemePreset('#10B981', 'Siber Zümrüt (Cyber Emerald)')" style="background: #0E1017; border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #10B981; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Siber Zümrüt</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#8B5CF6" onclick="selectThemePreset('#8B5CF6', 'Lüks Mor (Opium Purple)')" style="background: #0E1017; border: 1px solid rgba(139,92,246,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #8B5CF6; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Lüks Mor</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#D97706" onclick="selectThemePreset('#D97706', 'Sıcak Amber (Raw Amber)')" style="background: #0E1017; border: 1px solid rgba(217,119,6,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #D97706; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Sıcak Amber</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#EC4899" onclick="selectThemePreset('#EC4899', 'Neon Pembe (Hot Magenta)')" style="background: #0E1017; border: 1px solid rgba(236,72,153,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #EC4899; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Neon Pembe</span>
+              </button>
+
+              <button type="button" class="theme-preset-btn" data-color="#06B6D4" onclick="selectThemePreset('#06B6D4', 'Buz Mavisi (Ice Cyan)')" style="background: #0E1017; border: 1px solid rgba(6,182,212,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #06B6D4; vertical-align: middle; margin-right: 6px;"></span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Buz Mavisi</span>
+              </button>
+            </div>
+
+            <!-- Custom Hex Input & Live Color Picker -->
+            <div style="display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: center;">
+              <div>
+                <input type="color" id="theme-color-native" value="{{ site_settings.get('theme_color', '#2453FF') }}" style="width: 100%; height: 48px; border: 1px solid var(--border-hairline); border-radius: 8px; background: transparent; cursor: pointer; padding: 2px;" onchange="updateThemeColorInput(this.value)">
+              </div>
+              <div>
+                <input type="text" id="theme-color-input" name="theme_color" class="form-control" value="{{ site_settings.get('theme_color', '#2453FF') }}" placeholder="#2453FF" required oninput="updateThemeColorNative(this.value)">
+                <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 4px;">* Renk seçiciye tıklayabilir veya dilediğiniz HEX kodunu elle girebilirsiniz.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- FONT STİLLERİ AYARI (TYPOGRAPHY STUDIO)        -->
+          <!-- ============================================== -->
+          <div style="background: #141720; border: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 24px; margin: 24px 0;">
+            <div style="margin-bottom: 16px;">
+              <strong style="font-family: var(--font-mono); font-size: 13px; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.08em;">
+                ✍️ FONT & TİPOGRAFİ STİLLERİ
+              </strong>
+              <p style="font-size: 12px; color: var(--text-dim); margin: 4px 0 0;">
+                OBLIV sokak giyimi ve luxury estetiğine özel seçilmiş yüksek kaliteli font stilleri.
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <!-- Başlık Fontu -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Ana Başlık & Logo Fontu</label>
+                <select name="font_heading" id="heading-font-select" class="form-control" onchange="previewHeadingFont(this.value)">
+                  <option value="'Big Shoulders Display', Impact, sans-serif" {% if site_settings.get('font_heading') == "'Big Shoulders Display', Impact, sans-serif" or not site_settings.get('font_heading') %}selected{% endif %}>
+                    Big Shoulders Display (Orijinal Brutalist Streetwear)
+                  </option>
+                  <option value="'Anton', sans-serif" {% if site_settings.get('font_heading') == "'Anton', sans-serif" %}selected{% endif %}>
+                    Anton (Ultra Punch Ağır Sokak Başlığı)
+                  </option>
+                  <option value="'Archivo Black', sans-serif" {% if site_settings.get('font_heading') == "'Archivo Black', sans-serif" %}selected{% endif %}>
+                    Archivo Black (Kuvvetli & Tok Hip-Hop Drip)
+                  </option>
+                  <option value="'Oswald', sans-serif" {% if site_settings.get('font_heading') == "'Oswald', sans-serif" %}selected{% endif %}>
+                    Oswald (Kompakt Yüksek Gövde Tasarım)
+                  </option>
+                  <option value="'Russo One', sans-serif" {% if site_settings.get('font_heading') == "'Russo One', sans-serif" %}selected{% endif %}>
+                    Russo One (Keskin Metal & Streetwear Punch)
+                  </option>
+                  <option value="'Kanit', sans-serif" {% if site_settings.get('font_heading') == "'Kanit', sans-serif" %}selected{% endif %}>
+                    Kanit (Modern Tay-Stil Tok Tipografi)
+                  </option>
+                  <option value="'Bebas Neue', sans-serif" {% if site_settings.get('font_heading') == "'Bebas Neue', sans-serif" %}selected{% endif %}>
+                    Bebas Neue (Uzun Gövdeli Retro Sokak İmzası)
+                  </option>
+                  <option value="'Montserrat', sans-serif" {% if site_settings.get('font_heading') == "'Montserrat', sans-serif" %}selected{% endif %}>
+                    Montserrat (Kusursuz Tok & Heykelsi Bold)
+                  </option>
+                  <option value="'Syne', sans-serif" {% if site_settings.get('font_heading') == "'Syne', sans-serif" %}selected{% endif %}>
+                    Syne (Avangart & Fransız Moda Evi)
+                  </option>
+                  <option value="'Cinzel', serif" {% if site_settings.get('font_heading') == "'Cinzel', serif" %}selected{% endif %}>
+                    Cinzel (Gotik & Heykelsi High-Fashion)
+                  </option>
+                  <option value="'Cormorant Garamond', serif" {% if site_settings.get('font_heading') == "'Cormorant Garamond', serif" %}selected{% endif %}>
+                    Cormorant Garamond (Lüks & Haute Couture)
+                  </option>
+                  <option value="'Unbounded', sans-serif" {% if site_settings.get('font_heading') == "'Unbounded', sans-serif" %}selected{% endif %}>
+                    Unbounded (Fütüristik Geniş Sokak Modası)
+                  </option>
+                  <option value="'Epilogue', sans-serif" {% if site_settings.get('font_heading') == "'Epilogue', sans-serif" %}selected{% endif %}>
+                    Epilogue (Çağdaş Heavy Weight Başlık)
+                  </option>
+                  <option value="'Orbitron', sans-serif" {% if site_settings.get('font_heading') == "'Orbitron', sans-serif" %}selected{% endif %}>
+                    Orbitron (Siberpunk & Teknik Giyim)
+                  </option>
+                  <option value="'Space Grotesk', sans-serif" {% if site_settings.get('font_heading') == "'Space Grotesk', sans-serif" %}selected{% endif %}>
+                    Space Grotesk (Modern Mimari Drip)
+                  </option>
+                  <option value="'Rajdhani', sans-serif" {% if site_settings.get('font_heading') == "'Rajdhani', sans-serif" %}selected{% endif %}>
+                    Rajdhani (Teknik Keskin Köşeli)
+                  </option>
+                </select>
+                <div id="heading-font-preview" style="margin-top: 10px; padding: 12px; background: #090A0D; border: 1px solid var(--border-hairline); border-radius: 8px; font-size: 20px; font-weight: 900; text-transform: uppercase; color: #FFF;">
+                  OBLIV 2026 // NEW DROP
+                </div>
+              </div>
+
+              <!-- Metin / Gövde Fontu -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Gövde & Açıklama Metin Fontu</label>
+                <select name="font_body" id="body-font-select" class="form-control" onchange="previewBodyFont(this.value)">
+                  <option value="'Plus Jakarta Sans', sans-serif" {% if site_settings.get('font_body') == "'Plus Jakarta Sans', sans-serif" or not site_settings.get('font_body') %}selected{% endif %}>
+                    Plus Jakarta Sans (Kusursuz Okunabilirlik)
+                  </option>
+                  <option value="'Inter', sans-serif" {% if site_settings.get('font_body') == "'Inter', sans-serif" %}selected{% endif %}>
+                    Inter (Global Modern Tasarım Standardı)
+                  </option>
+                  <option value="'Outfit', sans-serif" {% if site_settings.get('font_body') == "'Outfit', sans-serif" %}selected{% endif %}>
+                    Outfit (Minimal & Premium Estetik)
+                  </option>
+                  <option value="'DM Sans', sans-serif" {% if site_settings.get('font_body') == "'DM Sans', sans-serif" %}selected{% endif %}>
+                    DM Sans (Dengeli & Modern Net Tipografi)
+                  </option>
+                  <option value="'Lexend', sans-serif" {% if site_settings.get('font_body') == "'Lexend', sans-serif" %}selected{% endif %}>
+                    Lexend (Göz Yormayan Akıcı Okuma)
+                  </option>
+                  <option value="'Urbanist', sans-serif" {% if site_settings.get('font_body') == "'Urbanist', sans-serif" %}selected{% endif %}>
+                    Urbanist (Yeni Nesil Geometrik Sokak Modası)
+                  </option>
+                  <option value="'Sora', sans-serif" {% if site_settings.get('font_body') == "'Sora', sans-serif" %}selected{% endif %}>
+                    Sora (Estetik Geniş Tipografi)
+                  </option>
+                  <option value="'Montserrat', sans-serif" {% if site_settings.get('font_body') == "'Montserrat', sans-serif" %}selected{% endif %}>
+                    Montserrat (Tok Geometrik Karakterler)
+                  </option>
+                  <option value="'JetBrains Mono', monospace" {% if site_settings.get('font_body') == "'JetBrains Mono', monospace" %}selected{% endif %}>
+                    JetBrains Mono (Teknik Kod & Streetwear Seri No)
+                  </option>
+                </select>
+                <div id="body-font-preview" style="margin-top: 10px; padding: 12px; background: #090A0D; border: 1px solid var(--border-hairline); border-radius: 8px; font-size: 13px; color: var(--text-dim); line-height: 1.5;">
+                  Saf kompakt pamuk kumaş, heykelsi boxy kesim ve net siluet.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IYZICO SETTINGS -->
+          <div style="background: #141720; border: 1px solid var(--electric-blue); border-radius: 12px; padding: 22px; margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-family: var(--font-mono); font-size: 12px; color: #FFFFFF; text-transform: uppercase;">
+                🛡️ İYZİCO (IYZIPAY) SANAL POS ENTEGRASYONU
+              </strong>
+              {% if site_settings.get('iyzico_api_key') and site_settings.get('iyzico_secret_key') %}
+                <span style="background: #10B981; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ● İYZİCO AKTİF
+                </span>
+              {% else %}
+                <span style="background: #3B4254; color: #FFF; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ○ TEST / SİMÜLASYON MODUNDA
+                </span>
+              {% endif %}
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px;">
+              İyzico Kontrol Panelinizden aldığınız <strong>API Anahtarı</strong> ve <strong>Güvenlik Anahtarı</strong> bilgilerini girin. Canlı hesaba geçene kadar Sandbox test ortamını kullanabilirsiniz.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">İyzico API Key</label>
+                <input type="text" name="iyzico_api_key" class="form-control" placeholder="Örn: sandbox-xxx ya da live-xxx" value="{{ site_settings.get('iyzico_api_key', '') }}">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">İyzico Secret Key</label>
+                <input type="password" name="iyzico_secret_key" class="form-control" placeholder="••••••••••••••••" value="{{ site_settings.get('iyzico_secret_key', '') }}">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">İyzico Base URL (Ortam)</label>
+              <select name="iyzico_base_url" class="form-control" style="background:#0D0E12;">
+                <option value="https://sandbox-api.iyzipay.com" {% if site_settings.get('iyzico_base_url') == 'https://sandbox-api.iyzipay.com' %}selected{% endif %}>Sandbox (Test Ortamı: https://sandbox-api.iyzipay.com)</option>
+                <option value="https://api.iyzipay.com" {% if site_settings.get('iyzico_base_url') == 'https://api.iyzipay.com' %}selected{% endif %}>Canlı Ortam (Gerçek Satış: https://api.iyzipay.com)</option>
+              </select>
+            </div>
+          </div>
+
+
+          <!-- SHOPIER SETTINGS -->
+          <div style="background: #141720; border: 1.5px solid var(--electric-blue); border-radius: 12px; padding: 22px; margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-family: var(--font-mono); font-size: 12px; color: #FFFFFF; text-transform: uppercase;">
+                💳 SHOPIER API ENTEGRASYONU (DİREKT SHOPIER SAYFASINA YÖNLENDİRME)
+              </strong>
+              {% if site_settings.get('shopier_api_key') and site_settings.get('shopier_api_secret') %}
+                <span style="background: #10B981; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ● SHOPIER BAĞLI
+                </span>
+              {% else %}
+                <span style="background: #EAB308; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ○ API ANAHTARLARINIZI GİRİN
+                </span>
+              {% endif %}
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px;">
+              Shopier panelinizden (<a href="https://www.shopier.com" target="_blank" style="color: var(--electric-blue); text-decoration: underline;">shopier.com</a> &gt; Entegrasyonlar &gt; API) aldığınız anahtarları buraya girin. Müşteri siparişi tamamladığında doğrudan Shopier'in kendi güvenli ödeme sayfasına gider.
+            </p>
+
+            <div style="background: #090A0E; border: 1px dashed var(--electric-blue); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; margin-bottom: 4px;">
+                🔗 SHOPIER GERİ DÖNÜŞ (REDIRECT / CALLBACK) URL ADRESİNİZ:
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <code style="font-family: var(--font-mono); font-size: 13px; color: #FFF; background: #131724; padding: 8px 12px; border-radius: 6px; flex: 1; word-break: break-all;">
+                  https://oblivwear.com.tr/shopier/callback
+                </code>
+                <button type="button" onclick="navigator.clipboard.writeText('https://oblivwear.com.tr/shopier/callback'); alert('Redirect URL kopyalandı!');" style="background: var(--electric-blue); border: none; color: #FFF; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 8px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                  Kopyala
+                </button>
+              </div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+                * Shopier panelinde (Entegrasyonlar > API) "Geri Dönüş URL (Callback / Redirect)" istenirse bu linki yapıştırın.
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Shopier API Key</label>
+                <input type="text" name="shopier_api_key" class="form-control" placeholder="Örn: 9a8b7c6d5e4f..." value="{{ site_settings.get('shopier_api_key', '') }}">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Shopier API Secret</label>
+                <input type="password" name="shopier_api_secret" class="form-control" placeholder="••••••••••••••••" value="{{ site_settings.get('shopier_api_secret', '') }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- HAVALE / FAST BANK SETTINGS -->
+          <div style="background: #141720; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 22px; margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-family: var(--font-mono); font-size: 12px; color: #FFFFFF; text-transform: uppercase;">
+                🏦 KİŞİSEL IBAN & HAVALE / FAST ÖDEME BİLGİLERİ
+              </strong>
+              <span style="background: #10B981; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                ● HER GÜN ANINDA HESABA
+              </span>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px;">
+              Müşterilerinizin 7/24 doğrudan IBAN numaranıza havale ve FAST ile ödeme gönderebilmesi için gereken resmi bilgiler.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Banka Adı</label>
+                <input type="text" name="bank_name" class="form-control" placeholder="Örn: Ziraat Bankası" value="{{ site_settings.get('bank_name', 'Ziraat Bankası') }}">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Hesap Sahibi (Ad Soyad)</label>
+                <input type="text" name="bank_account_holder" class="form-control" placeholder="Örn: Mustafa Umut Eker" value="{{ site_settings.get('bank_account_holder', 'Mustafa Umut Eker') }}">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">IBAN Numarası</label>
+              <input type="text" name="bank_iban" class="form-control" style="font-family: var(--font-mono); font-weight: 700; color: var(--electric-blue);" placeholder="TR..." value="{{ site_settings.get('bank_iban', 'TR59 0001 0090 1118 4713 7050 01') }}">
+            </div>
+          </div>
+
+          
+          <div style="background: #141720; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 22px; margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-family: var(--font-mono); font-size: 12px; color: #FFFFFF; text-transform: uppercase;">
+                📧 GMAIL DOĞRULAMA E-POSTASI ENTEGRASYONU
+              </strong>
+              {% if site_settings.get('smtp_app_password') %}
+                <span style="background: #10B981; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ● GMAIL SMTP AKTİF
+                </span>
+              {% else %}
+                <span style="background: #EAB308; color: #000; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">
+                  ○ SİMÜLASYON / UYGULAMA ŞİFRESİ GİRİN
+                </span>
+              {% endif %}
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px;">
+              Kayıt olan müşterilerinize 6 haneli güvenlik kodunun <strong style="color: #FFF;">oblivwear@gmail.com</strong> adresinden anında gitmesi için Google Hesabınızdan (Güvenlik &gt; 2 Adımlı Doğrulama &gt; <strong>Uygulama Şifreleri</strong>) 16 haneli bir Uygulama Şifresi alıp buraya girin.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Gönderici Gmail Adresi</label>
+                <input type="email" name="smtp_email" class="form-control" value="{{ site_settings.get('smtp_email', 'oblivwear@gmail.com') }}" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Gmail 16 Haneli Uygulama Şifresi</label>
+                <input type="password" name="smtp_app_password" class="form-control" placeholder="Örn: abcd efgh ijkl mnop" value="{{ site_settings.get('smtp_app_password', '') }}">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-drip-primary" style="padding: 14px 28px;">Ayarları Kaydet</button>
+        </form>
+      </div>
+    </div>
+
+    
+    <div id="section-support" style="margin-bottom: 50px; display: none;">
+      <div style="margin-bottom: 24px;">
+        <span style="font-family: var(--font-mono); font-size: 11px; color: #60A5FA; font-weight: 700; letter-spacing: 0.16em;">MÜŞTERİ HİZMETLERİ</span>
+        <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase;">
+          DESTEK TALEPLERİ
+        </h2>
+      </div>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+              <th style="padding: 16px 20px;">Talep No</th>
+              <th style="padding: 16px 20px;">Müşteri</th>
+              <th style="padding: 16px 20px;">Konu</th>
+              <th style="padding: 16px 20px;">Kategori</th>
+              <th style="padding: 16px 20px;">Durum</th>
+              <th style="padding: 16px 20px;">Mesaj</th>
+              <th style="padding: 16px 20px;">Tarih</th>
+              <th style="padding: 16px 20px;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ticket in support_tickets %}
+              <tr style="border-bottom: 1px solid var(--border-hairline);">
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 800; color: #60A5FA;">
+                  #{{ ticket['ticket_number'] }}
+                </td>
+                <td style="padding: 14px 20px;">
+                  <strong style="color: #FFFFFF;">{{ ticket['customer_fullname'] or ticket['user_name'] }}</strong>
+                  <div style="font-size: 11px; color: var(--text-dim);">{{ ticket['user_email'] }}</div>
+                </td>
+                <td style="padding: 14px 20px; color: #FFFFFF; font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ticket['subject'] }}</td>
+                <td style="padding: 14px 20px;">
+                  <span style="font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #1A1D2E; color: #A5B4FC; border: 1px solid #2D3352;">{{ ticket['category'] }}</span>
+                </td>
+                <td style="padding: 14px 20px;">
+                  {% if ticket['status'] == 'Açık' %}
+                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #1C2915; color: #86EFAC; border: 1px solid #2D5A1E;">● Açık</span>
+                  {% elif ticket['status'] == 'Yanıtlandı' %}
+                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #181E30; color: #60A5FA; border: 1px solid #2A3A6B;">● Yanıtlandı</span>
+                  {% elif ticket['status'] == 'Kapatıldı' %}
+                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #1A1A1A; color: #888888; border: 1px solid #333;">● Kapatıldı</span>
+                  {% else %}
+                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #2A1F0D; color: #FCD34D; border: 1px solid #5A4318;">● {{ ticket['status'] }}</span>
+                  {% endif %}
+                </td>
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 700; color: var(--electric-blue);">{{ ticket['message_count'] }}</td>
+                <td style="padding: 14px 20px; font-size: 11px; color: var(--text-dim); white-space: nowrap;">{{ ticket['created_at'][:16] }}</td>
+                <td style="padding: 14px 20px; display: flex; gap: 8px; align-items: center;">
+                  <a href="/support/{{ ticket['ticket_number'] }}" target="_blank" class="btn-drip-outline" style="padding: 6px 14px; font-size: 11px; white-space: nowrap;">
+                    Detay / Yanıtla ↗
+                  </a>
+                  <form action="/support/{{ ticket['ticket_number'] }}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Bu destek talebini silmek istediğinize emin misiniz?');">
+                    <button type="submit" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #EF4444; border-radius: 6px; padding: 6px 10px; font-size: 11px; cursor: pointer;">
+                      Sil
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="8" style="padding: 40px; text-align: center; color: var(--text-muted);">
+                  Henüz destek talebi bulunmuyor.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+    <div id="section-users" style="margin-bottom: 50px; display: none;">
+      <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase; margin-bottom: 24px;">
+        KAYITLI KULLANICILAR VE YETKİLER
+      </h2>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+              <th style="padding: 16px 20px;">ID</th>
+              <th style="padding: 16px 20px;">Ad Soyad</th>
+              <th style="padding: 16px 20px;">E-Posta</th>
+              <th style="padding: 16px 20px;">Kayıt Tarihi</th>
+              <th style="padding: 16px 20px;">Rol</th>
+              <th style="padding: 16px 20px;">Rol Değiştir</th>
+              <th style="padding: 16px 20px;">Sil</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr style="border-bottom: 1px solid var(--border-hairline);">
+                <td style="padding: 14px 20px; font-family: var(--font-mono);">#{{ u['id'] }}</td>
+                <td style="padding: 14px 20px; font-weight: 700; color: #FFFFFF;">{{ u['name'] }}</td>
+                <td style="padding: 14px 20px;">{{ u['email'] }}</td>
+                <td style="padding: 14px 20px;">
+                  {% if u['role'] == 'admin' %}
+                    <span style="font-family: var(--font-mono); font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--electric-blue); color: #FFF;">
+                      {{ u['role']|upper }}
+                    </span>
+                  {% else %}
+                    <span style="font-family: var(--font-mono); font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #222222; color: #AAAAAA;">
+                      {{ u['role']|upper }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td style="padding: 14px 20px; font-size: 11px; color: var(--text-dim); white-space: nowrap;">{{ u['created_at'][:10] if u['created_at'] else '-' }}</td>
+                <td style="padding: 14px 20px;">
+                  <form method="POST" action="/admin/users/update-role" style="display: flex; gap: 6px;">
+                    <input type="hidden" name="user_id" value="{{ u['id'] }}">
+                    <select name="role" class="form-control" style="padding: 4px 8px; font-size: 11px; width: auto;">
+                      <option value="customer" {% if u['role'] == 'customer' %}selected{% endif %}>Müşteri</option>
+                      <option value="admin" {% if u['role'] == 'admin' %}selected{% endif %}>Yönetici</option>
+                    </select>
+                    <button type="submit" class="btn-drip-outline" style="padding: 4px 10px; font-size: 10px;">Güncelle</button>
+                  </form>
+                </td>
+                <td style="padding: 14px 20px;">
+                  <form method="POST" action="/admin/users/delete" onsubmit="return confirm('Bu kullanıcıyı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!');">
+                    <input type="hidden" name="user_id" value="{{ u['id'] }}">
+                    <button type="submit" style="background: #4A1717; border: 1px solid #751F1F; color: #FFA3A3; padding: 6px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; cursor: pointer; white-space: nowrap;">
+                      🗑️ Sil
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 9. Yorum Yönetimi & Silme (Reviews CMS) -->
+    <div id="section-reviews" style="display: none; margin-bottom: 40px;">
+      <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: #F59E0B; font-weight: 700; letter-spacing: 0.16em;">MÜŞTERİ DENEYİMİ</span>
+          <h1 style="font-family: var(--font-display); font-size: 36px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase;">
+            ÜRÜN YORUMLARI & DEĞERLENDİRMELER
+          </h1>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); background: #111319; border: 1px solid var(--border-hairline); border-radius: 999px; padding: 6px 16px;">
+          Toplam <strong style="color: #FFF;">{{ reviews|length if reviews else 0 }}</strong> yorum kayıtlı
+        </div>
+      </div>
+
+      <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 14px; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-hairline); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">
+              <th style="padding: 16px 20px;">ID</th>
+              <th style="padding: 16px 20px;">Ürün</th>
+              <th style="padding: 16px 20px;">Müşteri</th>
+              <th style="padding: 16px 20px;">Puan</th>
+              <th style="padding: 16px 20px;">Yorum İçeriği</th>
+              <th style="padding: 16px 20px;">Fotoğraf</th>
+              <th style="padding: 16px 20px;">Tarih</th>
+              <th style="padding: 16px 20px; text-align: right;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if reviews %}
+              {% for r in reviews %}
+                <tr style="border-bottom: 1px solid var(--border-hairline);">
+                  <td style="padding: 16px 20px; font-family: var(--font-mono); color: var(--text-dim);">#{{ r['id'] }}</td>
+                  <td style="padding: 16px 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <img src="{{ r['product_image'] }}" alt="{{ r['product_name'] }}" style="width: 36px; height: 36px; object-fit: contain; border-radius: 6px; background: #07080B;">
+                      <a href="/product/{{ r['product_id'] }}" target="_blank" style="font-family: var(--font-display); font-size: 15px; font-weight: 800; color: #FFF; text-transform: uppercase;">
+                        {{ r['product_name'] }} ↗
+                      </a>
+                    </div>
+                  </td>
+                  <td style="padding: 16px 20px;">
+                    <div style="font-weight: 700; color: #FFF;">{{ r['user_name'] }}</div>
+                    <div style="font-size: 11px; color: var(--text-dim); font-family: var(--font-mono);">{{ r['user_email'] or '-' }}</div>
+                  </td>
+                  <td style="padding: 16px 20px; white-space: nowrap;">
+                    <span style="color: #F59E0B; letter-spacing: 1px; font-size: 14px;">
+                      {% for s in range(1, 6) %}{% if s <= r['rating'] %}★{% else %}<span style="color: rgba(255,255,255,0.18);">★</span>{% endif %}{% endfor %}
+                    </span>
+                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-left: 4px;">({{ r['rating'] }}/5)</span>
+                  </td>
+                  <td style="padding: 16px 20px; max-width: 320px; line-height: 1.5; color: var(--text-white);">
+                    {{ r['comment'] }}
+                  </td>
+                  <td style="padding: 16px 20px;">
+                    {% if r['photo_url'] %}
+                      <a href="{{ r['photo_url'] }}" target="_blank">
+                        <img src="{{ r['photo_url'] }}" alt="Fotoğraf" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-hairline);">
+                      </a>
+                    {% else %}
+                      <span style="color: var(--text-muted); font-size: 11px; font-family: var(--font-mono);">- Yok -</span>
+                    {% endif %}
+                  </td>
+                  <td style="padding: 16px 20px; font-size: 11px; color: var(--text-dim); font-family: var(--font-mono); white-space: nowrap;">
+                    {{ r['created_at'][:10] if r['created_at'] else '-' }}
+                  </td>
+                  <td style="padding: 16px 20px; text-align: right; white-space: nowrap;">
+                    <form method="POST" action="/admin/review/{{ r['id'] }}/delete" onsubmit="return confirm('Bu yorumu kalıcı olarak silmek istediğinize emin misiniz?');" style="display: inline-block;">
+                      <button type="submit" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #EF4444; padding: 6px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Sil
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" style="padding: 40px; text-align: center; color: var(--text-dim);">
+                  Henüz yapılmış bir ürün yorumu bulunmamaktadır.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function switchAdminTab(tabName) {
+    if (!tabName) tabName = 'overview';
+    const tabs = ['overview', 'products', 'add-product', 'categories', 'orders', 'support', 'reviews', 'settings', 'users'];
+    tabs.forEach(t => {
+      const el = document.getElementById('section-' + t);
+      if (el) {
+        el.style.display = (t === tabName) ? 'block' : 'none';
+      }
+    });
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+      if (link.getAttribute('data-tab') === tabName) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+    if (window.location.hash !== '#tab-' + tabName) {
+      try {
+        history.replaceState(null, '', '#tab-' + tabName);
+      } catch(e) {}
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#tab-', '').replace('#', '');
+    if (hash) {
+      switchAdminTab(hash);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Attach event listeners to nav links directly
+    document.querySelectorAll('.admin-nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tab = this.getAttribute('data-tab');
+        if (tab) switchAdminTab(tab);
+      });
+    });
+
+    document.querySelectorAll('.admin-color-dot').forEach(dot => {
+      if (dot.dataset.hex) dot.style.backgroundColor = dot.dataset.hex;
+    });
+
+    const hash = window.location.hash.replace('#tab-', '').replace('#', '');
+    if (hash && ['overview', 'products', 'add-product', 'categories', 'orders', 'support', 'settings', 'users'].includes(hash)) {
+      switchAdminTab(hash);
+    } else {
+      switchAdminTab('overview');
+    }
+
+    document.querySelectorAll('.featured-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const label = this.querySelector('.featured-btn-label');
+        const fd = new FormData();
+        fd.append('product_id', productId);
+        this.disabled = true;
+        fetch('/admin/products/toggle-featured', { method: 'POST', body: fd })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              const isFeatured = data.is_featured;
+              this.dataset.featured = isFeatured;
+              label.textContent = isFeatured ? 'ÖNE ÇIKARILDI' : 'ÖNE ÇIKAR';
+              if (isFeatured) {
+                this.style.borderColor = 'var(--electric-blue)';
+                this.style.background = 'rgba(36,83,255,0.2)';
+                this.style.color = '#7EB3FF';
+              } else {
+                this.style.borderColor = 'var(--border-hairline)';
+                this.style.background = '#0F1014';
+                this.style.color = 'var(--text-dim)';
+              }
+            }
+          })
+          .catch(console.error)
+          .finally(() => { this.disabled = false; });
+      });
+    });
+
+    window.updateProductDisplayOrder = function(inputEl) {
+      const productId = inputEl.dataset.productId;
+      const newOrder = inputEl.value;
+      const originalBg = inputEl.style.background;
+      inputEl.style.background = 'rgba(36, 83, 255, 0.25)';
+
+      const fd = new FormData();
+      fd.append('product_id', productId);
+      fd.append('display_order', newOrder);
+
+      fetch('/admin/products/update-order', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            inputEl.style.background = 'rgba(16, 185, 129, 0.25)';
+            inputEl.style.borderColor = '#10B981';
+            setTimeout(() => {
+              inputEl.style.background = '#0A0C10';
+              inputEl.style.borderColor = 'var(--border-subtle)';
+            }, 800);
+          } else {
+            inputEl.style.background = 'rgba(239, 68, 68, 0.25)';
+            inputEl.style.borderColor = '#EF4444';
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          inputEl.style.background = 'rgba(239, 68, 68, 0.25)';
+        });
+    };
+    const isFeaturedAddToggle = document.getElementById('isFeaturedAddToggle');
+    const isFeaturedAddSlider = document.getElementById('isFeaturedAddSlider');
+    if (isFeaturedAddToggle && isFeaturedAddSlider) {
+      const updateSlider = () => {
+        if (isFeaturedAddToggle.checked) {
+          isFeaturedAddSlider.style.backgroundColor = 'var(--electric-blue)';
+          isFeaturedAddSlider.style.boxShadow = '0 0 12px rgba(36,83,255,0.6)';
+        } else {
+          isFeaturedAddSlider.style.backgroundColor = '#242731';
+          isFeaturedAddSlider.style.boxShadow = 'none';
+        }
+      };
+      isFeaturedAddToggle.addEventListener('change', updateSlider);
+      updateSlider();
+    }
+
+    const has360AddToggle = document.getElementById('has360AddToggle');
+    const has360AddSlider = document.getElementById('has360AddSlider');
+    if (has360AddToggle && has360AddSlider) {
+      const update360Slider = () => {
+        if (has360AddToggle.checked) {
+          has360AddSlider.style.backgroundColor = '#10B981';
+          has360AddSlider.style.boxShadow = '0 0 12px rgba(16,185,129,0.6)';
+        } else {
+          has360AddSlider.style.backgroundColor = '#242731';
+          has360AddSlider.style.boxShadow = 'none';
+        }
+      };
+      has360AddToggle.addEventListener('change', update360Slider);
+      update360Slider();
+    }
+  });
+
+  function addAdminAddColorRow() {
+    const container = document.getElementById('admin-add-extra-colors-container');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.style.cssText = 'display: grid; grid-template-columns: 1.5fr 1fr 1.5fr 40px; gap: 14px; margin-top: 12px; align-items: end; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-hairline);';
+    row.innerHTML = `
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Ek Renk Adı</label>
+        <input type="text" name="extra_color_name[]" class="form-control" placeholder="Örn: Beyaz, Vizon, Asker Yeşili" required>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Renk Kodu</label>
+        <input type="color" name="extra_color_hex[]" class="form-control" value="#FFFFFF" style="height: 48px; padding: 2px;">
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Bu Renge Özel Fotoğraf</label>
+        <input type="file" name="extra_color_photo[]" accept="image/*" class="form-control" style="padding: 9px; font-size: 11px;">
+      </div>
+      <button type="button" onclick="this.parentElement.remove()" style="height: 48px; background: rgba(239,68,68,0.15); border: 1px solid #EF4444; color: #FCA5A5; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;" title="Rengi Sil">
+        &times;
+      </button>
+    `;
+    container.appendChild(row);
+  }
+
+  function selectThemePreset(hex, label) {
+    const input = document.getElementById('theme-color-input');
+    const native = document.getElementById('theme-color-native');
+    const badge = document.getElementById('current-theme-badge');
+    if (input) input.value = hex;
+    if (native) native.value = hex;
+    if (badge) {
+      badge.textContent = hex;
+      badge.style.backgroundColor = hex;
+      badge.style.boxShadow = `0 0 14px ${hex}66`;
+    }
+  }
+
+  function updateThemeColorInput(hex) {
+    const input = document.getElementById('theme-color-input');
+    const badge = document.getElementById('current-theme-badge');
+    if (input) input.value = hex.toUpperCase();
+    if (badge) {
+      badge.textContent = hex.toUpperCase();
+      badge.style.backgroundColor = hex;
+      badge.style.boxShadow = `0 0 14px ${hex}66`;
+    }
+  }
+
+  function updateThemeColorNative(hex) {
+    const native = document.getElementById('theme-color-native');
+    const badge = document.getElementById('current-theme-badge');
+    if (/^#[0-9A-F]{6}$/i.test(hex)) {
+      if (native) native.value = hex;
+      if (badge) {
+        badge.textContent = hex.toUpperCase();
+        badge.style.backgroundColor = hex;
+        badge.style.boxShadow = `0 0 14px ${hex}66`;
+      }
+    }
+  }
+
+  function previewHeadingFont(fontVal) {
+    const preview = document.getElementById('heading-font-preview');
+    if (preview) {
+      preview.style.fontFamily = fontVal;
+    }
+  }
+
+  function previewBodyFont(fontVal) {
+    const preview = document.getElementById('body-font-preview');
+    if (preview) {
+      preview.style.fontFamily = fontVal;
+    }
+  }
+
+  function updateSalesToggleUI(checkbox) {
+    const isChecked = checkbox.checked;
+    const badge = document.getElementById('sales-status-badge');
+    const text = document.getElementById('sales-status-text');
+    const slider = document.getElementById('salesEnabledSlider');
+    const knob = document.getElementById('salesEnabledKnob');
+    if (slider && knob) {
+      if (isChecked) {
+        slider.style.backgroundColor = '#10B981';
+        knob.style.left = '26px';
+      } else {
+        slider.style.backgroundColor = '#EF4444';
+        knob.style.left = '4px';
+      }
+    }
+    if (badge && text) {
+      if (isChecked) {
+        badge.style.background = 'rgba(16, 185, 129, 0.15)';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        badge.style.color = '#10B981';
+        text.textContent = 'SATIŞLAR AÇIK (ÖDEMELER VE SİPARİŞ ALIMI AKTİF)';
+      } else {
+        badge.style.background = 'rgba(239, 68, 68, 0.15)';
+        badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        badge.style.color = '#EF4444';
+        text.textContent = 'SATIŞLAR KAPALI (ÖDEMELER VE CHECKOUT KİLİTLİ)';
+      }
+    }
+  }
+
+  function updateWishlistToggleUI(checkbox) {
+    const isChecked = checkbox.checked;
+    const badge = document.getElementById('wishlist-status-badge');
+    const text = document.getElementById('wishlist-status-text');
+    const slider = document.getElementById('wishlistModeSlider');
+    const knob = document.getElementById('wishlistModeKnob');
+    if (slider && knob) {
+      if (isChecked) {
+        slider.style.backgroundColor = '#F59E0B';
+        knob.style.left = '26px';
+      } else {
+        slider.style.backgroundColor = '#374151';
+        knob.style.left = '4px';
+      }
+    }
+    if (badge && text) {
+      if (isChecked) {
+        badge.style.background = 'rgba(245, 158, 11, 0.15)';
+        badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        badge.style.color = '#FBBF24';
+        text.textContent = 'İSTEK LİSTESİ MODU AKTİF (ÖDEME & CHECKOUT KAPALI)';
+      } else {
+        badge.style.background = 'rgba(107, 114, 128, 0.15)';
+        badge.style.borderColor = 'rgba(107, 114, 128, 0.3)';
+        badge.style.color = '#9CA3AF';
+        text.textContent = 'İSTEK LİSTESİ KAPALI (NORMAL SEPET & ÖDEME MODU)';
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const badge = document.getElementById('current-theme-badge');
+    if (badge && badge.dataset.theme) {
+      badge.style.backgroundColor = badge.dataset.theme;
+      badge.style.boxShadow = `0 0 14px ${badge.dataset.theme}66`;
+    }
+    const hSelect = document.getElementById('heading-font-select');
+    if (hSelect) previewHeadingFont(hSelect.value);
+    const bSelect = document.getElementById('body-font-select');
+    if (bSelect) previewBodyFont(bSelect.value);
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 680" width="100%" height="100%">
+  <defs>
+    <filter id="hood-shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Solid Clean Modern Backdrop (Zero gradients) -->
+  <rect width="100%" height="100%" fill="#121316" rx="20"/>
+
+  <g filter="url(#hood-shadow)">
+    <!-- Heavyweight Boxy Cut T-Shirt Body -->
+    <path d="M 210 70
+             C 240 100, 360 100, 390 70
+             L 520 135
+             L 460 270
+             L 410 245
+             L 410 590
+             C 410 600, 400 605, 385 605
+             L 215 605
+             C 200 605, 190 600, 190 590
+             L 190 245
+             L 140 270
+             L 80 135
+             Z" 
+          fill="#6B3027" 
+          stroke="#4A1F18" 
+          stroke-width="2" 
+          stroke-linejoin="round" />
+
+    <!-- Crew Neck Ribbing -->
+    <path d="M 210 70 C 240 105, 360 105, 390 70 C 375 88, 225 88, 210 70 Z" 
+          fill="#4A1F18" 
+          stroke="#4A1F18" 
+          stroke-width="1.5" />
+
+    <!-- Sleeve Stitches -->
+    <line x1="88" y1="145" x2="148" y2="265" stroke="#4A1F18" stroke-width="2" stroke-dasharray="5 4" opacity="0.4"/>
+    <line x1="512" y1="145" x2="452" y2="265" stroke="#4A1F18" stroke-width="2" stroke-dasharray="5 4" opacity="0.4"/>
+
+    <!-- ============================================== -->
+    <!-- OFFICIAL OBLIV LOGO (CHEST GRAPHIC)             -->
+    <!-- ============================================== -->
+    <g transform="translate(195, 205)">
+      <!-- Star/Cross inside Oval 'O' -->
+      <ellipse cx="30" cy="20" rx="26" ry="14" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+      <!-- Four-point star inside O -->
+      <path d="M 30 10 Q 30 20, 20 20 Q 30 20, 30 30 Q 30 20, 40 20 Q 30 20, 30 10 Z" fill="#FFFFFF"/>
+      
+      <!-- B -->
+      <text x="64" y="31" fill="#FFFFFF" font-family="'Big Shoulders Display', serif" font-weight="900" font-size="36" letter-spacing="1">B</text>
+      
+      <!-- L -->
+      <text x="96" y="31" fill="#FFFFFF" font-family="'Big Shoulders Display', serif" font-weight="900" font-size="36" letter-spacing="1">L</text>
+      
+      <!-- I (dagger-like) -->
+      <path d="M 128 35 L 128 5 L 132 8 L 132 32 Z" fill="#FFFFFF"/>
+      
+      <!-- V (Cobalt Blue with registered mark) -->
+      <text x="140" y="31" fill="#2453FF" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="38">V</text>
+      <circle cx="178" cy="8" r="4.5" fill="none" stroke="#2453FF" stroke-width="0.8"/>
+      <text x="178" y="10.5" fill="#2453FF" font-family="'JetBrains Mono', monospace" font-size="5" text-anchor="middle" font-weight="700">R</text>
+    </g>
+
+    <!-- Album Sub-Bar underneath Chest Logo -->
+    <text x="300" y="270" fill="#9296A1" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="8" text-anchor="middle" letter-spacing="2.5">ALBUM 06 // RUSTIC DRIP</text>
+    <text x="300" y="284" fill="#2453FF" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="6.5" text-anchor="middle" letter-spacing="1.5">DELUXE MASTER</text>
+
+    <!-- Inner Neck Brand Print -->
+    <text x="300" y="130" fill="#4A1F18" font-family="'Big Shoulders Display', Impact, sans-serif" font-weight="900" font-size="14" letter-spacing="5" text-anchor="middle" opacity="0.6">OBLIV</text>
+    <text x="300" y="142" fill="#4A1F18" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="6" letter-spacing="2" text-anchor="middle" opacity="0.4">HEAVYWEIGHT 260 GSM // SIGNATURE CUT</text>
+
+    <!-- Bottom Hem Heavy Label Tab -->
+    <rect x="398" y="550" width="18" height="28" rx="2" fill="#2453FF"/>
+    <text x="407" y="568" fill="#FFFFFF" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="7" text-anchor="middle" transform="rotate(-90 407 568)">OBLIV</text>
+  </g>
+</svg>

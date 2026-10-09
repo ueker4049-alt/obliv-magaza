@@ -1,0 +1,1002 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product['name'] }} | OBLIV{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product['name']|escape }}",
+  "image": "{{ product['image_url'] }}",
+  "description": "{{ product['description']|striptags|truncate(150)|escape if product['description'] else 'OBLIV Ağır Gramaj Sokak Giyimi' }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "OBLIV"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.url }}",
+    "priceCurrency": "TRY",
+    "price": "{{ '%.2f'|format(product['price']) }}",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="detail-box-wrap">
+  <div class="detail-img-box" style="flex-direction: column; gap: 16px;">
+    <!-- Interactive Zoom Container -->
+    <div id="product-zoom-container" style="width: 100%; display: flex; align-items: center; justify-content: center; min-height: 480px; position: relative; border-radius: 18px; cursor: crosshair; overflow: hidden; background: #0B0D12;">
+      <!-- TEK VE NET T-SHIRT GÖRSELİ -->
+      <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}" id="main-product-img" loading="eager" decoding="async" style="width: 100%; max-width: 460px; height: auto; max-height: 480px; object-fit: contain; display: block; margin: 0 auto; transition: transform 0.25s ease, opacity 0.2s ease;">
+      
+      <!-- 1. 360° SPIN ROLL BUTONU (Sadece 360 Ayarı Açık Ürünlerde Görünür) -->
+      {% if product.get('has_360') and product.get('back_image_url') %}
+      <button type="button" id="toggle-360-btn" title="Ön/Arka Çevir" style="position: absolute; bottom: 14px; left: 14px; background: rgba(10, 12, 18, 0.9); border: 1px solid var(--electric-blue); color: #FFFFFF; padding: 7px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; font-family: var(--font-mono); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; z-index: 5;">
+        <span>🔄 ÖN / ARKA ÇEVİR</span>
+      </button>
+      {% endif %}
+
+      <!-- Click to enlarge hint button -->
+      <button type="button" id="open-lightbox-btn" title="Tam Ekran Büyüt" style="position: absolute; bottom: 14px; right: 14px; background: rgba(10, 12, 18, 0.85); border: 1px solid var(--border-hairline); color: #FFFFFF; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px); z-index: 5;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="14"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Çoklu Fotoğraf Küçük Resimler (Thumbnails) Galerisi -->
+    {% if product['gallery_images'] and product['gallery_images']|length > 1 %}
+      <div class="product-gallery-thumbs" style="display: flex; gap: 10px; overflow-x: auto; max-width: 100%; padding: 6px 4px; justify-content: center;" id="gallery-thumbs-row">
+        {% for g_img in product['gallery_images'] %}
+          <button 
+            type="button" 
+            class="gallery-thumb-btn {% if loop.first %}active{% endif %}" 
+            data-src="{{ g_img['image_url'] }}">
+            <img src="{{ g_img['image_url'] }}" alt="Fotoğraf {{ loop.index }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Full-Screen Lightbox Modal -->
+  <div id="image-lightbox-modal" style="display: none; position: fixed; inset: 0; background: rgba(5, 6, 8, 0.94); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);">
+    <button type="button" id="close-lightbox-btn" style="position: absolute; top: 24px; right: 28px; background: none; border: none; color: #FFF; font-size: 38px; cursor: pointer; line-height: 1; z-index: 10001; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&times;</button>
+    <div style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+      <img src="{{ product['image_url'] }}" id="lightbox-img" alt="{{ product['name'] }}" style="max-width: 90vw; max-height: 88vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.9);">
+    </div>
+  </div>
+
+  <div class="detail-info-box">
+    <div style="font-family: var(--font-mono); font-size: 12px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px;">
+      {{ product['category'] }}
+    </div>
+
+    <h1 class="detail-title">
+      {{ product['name'] }}
+    </h1>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+      <div style="display: flex; align-items: center; color: #F59E0B; font-size: 15px; letter-spacing: 2px;">
+        {% for star in range(1, 6) %}
+          {% if star <= avg_rating|round(0, 'floor') %}
+            ★
+          {% else %}
+            <span style="color: rgba(255,255,255,0.18);">★</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <a href="#reviews-section" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+        <span style="color: #FFFFFF; font-weight: 700;">{{ avg_rating }}</span>
+        <span>({{ rating_count }} Değerlendirme)</span>
+      </a>
+    </div>
+
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-hairline);">
+      <span style="font-family: var(--font-mono); font-size: 2.2rem; font-weight: 800; color: #FFFFFF;">
+        {{ product['price']|int }} ₺
+      </span>
+      {% if product['old_price'] %}
+        <span style="font-family: var(--font-mono); font-size: 1.3rem; color: var(--text-muted); text-decoration: line-through;">
+          {{ product['old_price']|int }} ₺
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- KISA AÇIKLAMA / VURGULU ÖZET -->
+    {% if product['description'] %}
+    <p style="font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-hairline);">
+      {{ product['description'] }}
+    </p>
+    {% endif %}
+
+    <!-- RENK SEÇİMİ (VARYASYONLAR) -->
+    <div style="margin-bottom: 20px;">
+      <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px;">
+        RENK: <span id="selected-color-name" style="color: #FFFFFF; font-weight: 700;">{{ product['color_name'] }}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;" id="product-color-options">
+        {% if product['colors'] %}
+          {% for col in product['colors'] %}
+            <button 
+              type="button" 
+              class="product-color-swatch-btn {% if loop.first %}active{% endif %}" 
+              data-color-name="{{ col['color_name']|escape }}" 
+              data-hex="{{ col['color_hex'] }}"
+              data-img="{{ col['image_url'] or '' }}"
+              title="{{ col['color_name'] }}">
+            </button>
+          {% endfor %}
+        {% else %}
+          <div class="product-color-swatch" data-hex="{{ product['color_hex'] }}" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #FFFFFF;"></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- BEDEN SEÇİMİ -->
+    <div style="margin-bottom: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em;">
+          BEDEN: <span id="selected-size-label" style="color: #FFFFFF; font-weight: 800;">M</span>
+          <span id="selected-size-stock" style="margin-left: 10px; font-size: 10px; color: #10B981; font-weight: 700;">({{ product['stock_m'] if product['stock_m'] is not none else 25 }} Adet Stokta)</span>
+        </div>
+        <button type="button" onclick="openSizeChartModal()" style="background: none; border: none; color: var(--electric-blue); font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-decoration: underline; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          Beden Rehberi
+        </button>
+      </div>
+
+      <div class="size-pill-grid" id="size-pill-container" style="margin: 0 0 16px;">
+        {% set s_stock = product['stock_s'] if product['stock_s'] is not none else 15 %}
+        {% set m_stock = product['stock_m'] if product['stock_m'] is not none else 25 %}
+        {% set l_stock = product['stock_l'] if product['stock_l'] is not none else 20 %}
+        {% set xl_stock = product['stock_xl'] if product['stock_xl'] is not none else 10 %}
+
+        <button type="button" class="size-pill-btn {% if s_stock == 0 %}out-of-stock{% endif %}" data-size="S" data-stock="{{ s_stock }}">
+          S
+        </button>
+        <button type="button" class="size-pill-btn active {% if m_stock == 0 %}out-of-stock{% endif %}" data-size="M" data-stock="{{ m_stock }}">
+          M
+        </button>
+        <button type="button" class="size-pill-btn {% if l_stock == 0 %}out-of-stock{% endif %}" data-size="L" data-stock="{{ l_stock }}">
+          L
+        </button>
+        <button type="button" class="size-pill-btn {% if xl_stock == 0 %}out-of-stock{% endif %}" data-size="XL" data-stock="{{ xl_stock }}">
+          XL
+        </button>
+      </div>
+
+      <!-- Akıllı Beden Asistanı (Smart Size Finder) - Katlanabilir & Kompakt -->
+      <details style="background: #0E1016; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 12px 16px; margin-bottom: 24px;">
+        <summary style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #FFFFFF; list-style: none;">
+          <span style="display: flex; align-items: center; gap: 6px;">
+            <span>SIZE ASST //</span> Hangi Beden Bana Uygun?
+          </span>
+          <span id="smart-size-recommendation" style="font-weight: 800; color: var(--electric-blue);">
+            M Beden (Öneri) ▾
+          </span>
+        </summary>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-hairline);">
+          <div>
+            <label style="font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 4px;">BOY (cm): <strong id="height-val" style="color: #FFF;">175</strong></label>
+            <input type="range" id="smart-height-input" min="155" max="200" value="175" style="width: 100%; accent-color: var(--electric-blue); cursor: pointer;" oninput="updateSmartSize()">
+          </div>
+          <div>
+            <label style="font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 4px;">KİLO (kg): <strong id="weight-val" style="color: #FFF;">72</strong></label>
+            <input type="range" id="smart-weight-input" min="50" max="115" value="72" style="width: 100%; accent-color: var(--electric-blue); cursor: pointer;" oninput="updateSmartSize()">
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- SEPETE EKLE & HEMEN AL / İSTEK LİSTESİ BUTONLARI -->
+    <div 
+      id="product-detail-data"
+      data-id="{{ product['id'] }}"
+      data-name="{{ product['name']|escape }}"
+      data-price="{{ product['price'] }}"
+      data-color="{{ product['color_name']|escape }}"
+      data-image="{{ product['image_url'] }}"
+      style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;">
+      
+      <div style="display: flex; gap: 12px;">
+        {% if settings.get('wishlist_mode', '0') == '1' %}
+          <button 
+            id="detail-wishlist-toggle-btn"
+            class="btn-wishlist-toggle-action btn-drip-primary" 
+            data-id="{{ product['id'] }}"
+            data-name="{{ product['name']|escape }}"
+            style="flex: 2; justify-content: center; padding: 18px 24px; font-size: 13px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; background: #FFFFFF; border: 1px solid #FFFFFF; color: #000000; cursor: pointer; box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);"
+            type="button">
+            <span class="wishlist-icon" style="font-size: 16px; margin-right: 6px;">☆</span>
+            <span class="wishlist-btn-label">İSTEK LİSTESİNE EKLE</span>
+          </button>
+        {% else %}
+          <button 
+            id="detail-add-btn"
+            class="btn-drip-primary" 
+            onclick="handleDetailAddToCart()"
+            style="flex: 2; justify-content: center; padding: 18px 24px; font-size: 13px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;"
+            type="button">
+            SEPETE EKLE
+          </button>
+          {% if settings.get('sales_enabled', '1') != '0' %}
+            <button 
+              id="detail-fast-buy-btn"
+              class="btn-drip-outline" 
+              onclick="handleDetailFastBuy()"
+              style="flex: 1; justify-content: center; padding: 18px 20px; font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;"
+              type="button">
+              HEMEN AL
+            </button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- CORTEIZ MINIMAL AKORDEON (SADE, EMOJİSİZ, TÜRKÇE & PROFESYONEL) -->
+    <div class="corteiz-accordion-wrap" style="border-top: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 30px;">
+      
+      <!-- 1. ÜRÜN DETAYLARI -->
+      <details class="corteiz-acc-item" style="border-bottom: 1px solid rgba(255, 255, 255, 0.15);">
+        <summary style="display: flex; justify-content: space-between; align-items: center; padding: 18px 4px; font-family: var(--font-mono); font-size: 13px; font-weight: 800; letter-spacing: 0.14em; color: #FFFFFF; text-transform: uppercase; cursor: pointer; list-style: none;">
+          <span>ÜRÜN DETAYLARI</span>
+          <span class="acc-chevron" style="color: #9CA3AF; font-size: 15px; font-family: var(--font-mono); font-weight: 700;">&gt;</span>
+        </summary>
+        <div style="padding: 0 4px 20px 4px; font-family: var(--font-mono); font-size: 12px; color: #9CA3AF; line-height: 1.8;">
+          <div>• 240 GSM AĞIR GRAMAJ TOK SAF PAMUK KUMAŞ</div>
+          <div>• ÖZEL MİMARİ BOXY STREETWEAR OVERSIZE KESİM</div>
+          <div>• YIKAMADA ÇEKME YAPMAYAN VE FORMU BOZULMAYAN DÖKÜM</div>
+          <div>• YÜKSEK ÇÖZÜNÜRLÜKLÜ ÇATLAMAZ HD SERİGRAFİ BASKI</div>
+          <div>• ORİJİNAL OBLIV WEAR ENSE ETİKETİ VE KALIP İMZASI</div>
+        </div>
+      </details>
+
+      <!-- 2. BEDEN TABLOSU -->
+      <details class="corteiz-acc-item" style="border-bottom: 1px solid rgba(255, 255, 255, 0.15);">
+        <summary style="display: flex; justify-content: space-between; align-items: center; padding: 18px 4px; font-family: var(--font-mono); font-size: 13px; font-weight: 800; letter-spacing: 0.14em; color: #FFFFFF; text-transform: uppercase; cursor: pointer; list-style: none;">
+          <span>BEDEN TABLOSU</span>
+          <span class="acc-chevron" style="color: #9CA3AF; font-size: 15px; font-family: var(--font-mono); font-weight: 700;">&gt;</span>
+        </summary>
+        <div style="padding: 0 4px 20px 4px; font-family: var(--font-mono); font-size: 12px; color: #9CA3AF;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 8px;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #FFFFFF;">
+                <th style="padding: 8px 4px;">BEDEN</th>
+                <th style="padding: 8px 4px;">EN (GÖĞÜS)</th>
+                <th style="padding: 8px 4px;">BOY</th>
+                <th style="padding: 8px 4px;">KOL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 8px 4px; color: #FFF; font-weight: 700;">S</td><td style="padding: 8px 4px;">56 CM</td><td style="padding: 8px 4px;">72 CM</td><td style="padding: 8px 4px;">22 CM</td></tr>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 8px 4px; color: #FFF; font-weight: 700;">M</td><td style="padding: 8px 4px;">59 CM</td><td style="padding: 8px 4px;">74 CM</td><td style="padding: 8px 4px;">23 CM</td></tr>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 8px 4px; color: #FFF; font-weight: 700;">L</td><td style="padding: 8px 4px;">62 CM</td><td style="padding: 8px 4px;">76 CM</td><td style="padding: 8px 4px;">24 CM</td></tr>
+              <tr><td style="padding: 8px 4px; color: #FFF; font-weight: 700;">XL</td><td style="padding: 8px 4px;">65 CM</td><td style="padding: 8px 4px;">78 CM</td><td style="padding: 8px 4px;">25 CM</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 12px; font-size: 11px; color: #6B7280;">*Standart oversize duruş için kendi bedeninizi, ekstra bol ve dökümlü görünüm için bir beden büyük tercih edebilirsiniz.</p>
+        </div>
+      </details>
+
+      <!-- 3. KARGO VE TESLİMAT -->
+      <details class="corteiz-acc-item" style="border-bottom: 1px solid rgba(255, 255, 255, 0.15);">
+        <summary style="display: flex; justify-content: space-between; align-items: center; padding: 18px 4px; font-family: var(--font-mono); font-size: 13px; font-weight: 800; letter-spacing: 0.14em; color: #FFFFFF; text-transform: uppercase; cursor: pointer; list-style: none;">
+          <span>KARGO VE TESLİMAT</span>
+          <span class="acc-chevron" style="color: #9CA3AF; font-size: 15px; font-family: var(--font-mono); font-weight: 700;">&gt;</span>
+        </summary>
+        <div style="padding: 0 4px 20px 4px; font-family: var(--font-mono); font-size: 12px; color: #9CA3AF; line-height: 1.8;">
+          <div>• SAAT 16:00'A KADAR VERİLEN SİPARİŞLER AYNI GÜN YURTİÇİ KARGO'YA TESLİM EDİLİR.</div>
+          <div>• TÜM TÜRKİYE'YE 1-3 İŞ GÜNÜ İÇERİSİNDE HIZLI VE SİGORTALI TESLİMAT.</div>
+          <div>• KOLAY DEĞİŞİM VE İADE İÇİN 14 GÜN KOŞULSUZ MÜŞTERİ DESTEĞİ.</div>
+        </div>
+      </details>
+
+    </div>
+
+    
+    <div style="background: #0E0F14; color: #FFFFFF; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 28px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+      
+      <div style="display: flex; justify-content: center; gap: 36px; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 24px;">
+        <button id="tab-btn-recommend" onclick="switchSizeTab('recommend')" style="background: none; border: none; padding-bottom: 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: #FFFFFF; border-bottom: 2px solid var(--electric-blue); margin-bottom: -1px;">
+          Beden Öneri Tablosu
+        </button>
+        <button id="tab-btn-measure" onclick="switchSizeTab('measure')" style="background: none; border: none; padding-bottom: 10px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text-dim); border-bottom: 2px solid transparent; margin-bottom: -1px;">
+          Ölçü Tablosu
+        </button>
+      </div>
+
+      <!-- Beden Öneri Tablosu -->
+      <div id="size-content-recommend" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table style="width: 100%; min-width: 340px; border-collapse: collapse; text-align: center; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.02);">
+              <th style="padding: 12px 10px; text-align: left; font-weight: 800; color: #FFFFFF;">KİLO \ BOY</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">150 - 160 cm</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">160 - 170 cm</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">170 - 180 cm</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">180+ cm</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 14px 10px; text-align: left; color: #FFFFFF; font-weight: 700;">45 - 50 kg</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XXS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XXS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">S</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 14px 10px; text-align: left; color: #FFFFFF; font-weight: 700;">50 - 60 kg</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XS</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">S</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 14px 10px; text-align: left; color: #FFFFFF; font-weight: 700;">60 - 70 kg</td>
+              <td style="padding: 14px 8px; color: #FFFFFF; font-weight: 700;">M</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">S</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">S</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">S</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 14px 10px; text-align: left; color: #FFFFFF; font-weight: 700;">70 - 80 kg</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">L</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">L</td>
+              <td style="padding: 14px 8px; color: #FFFFFF; font-weight: 700;">M</td>
+              <td style="padding: 14px 8px; color: #FFFFFF; font-weight: 700;">M</td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 10px; text-align: left; color: #FFFFFF; font-weight: 700;">80 - 90 kg</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XL</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">XL</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">L</td>
+              <td style="padding: 14px 8px; color: var(--text-dim);">L</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Ölçü Tablosu -->
+      <div id="size-content-measure" style="display: none; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table style="width: 100%; min-width: 320px; border-collapse: collapse; text-align: center; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.12);">
+              <th style="padding: 12px 8px; text-align: left; font-weight: 800; color: #FFFFFF;">Beden</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">En (Göğüs)</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">Boy</th>
+              <th style="padding: 12px 8px; font-weight: 800; color: #FFFFFF;">Kol Boyu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 12px 8px; text-align: left; font-weight: 700; color: #FFFFFF;">S</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">56 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">72 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">22 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 12px 8px; text-align: left; font-weight: 700; color: #FFFFFF;">M</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">59 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">74 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">23 cm</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <td style="padding: 12px 8px; text-align: left; font-weight: 700; color: #FFFFFF;">L</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">62 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">76 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">24 cm</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 8px; text-align: left; font-weight: 700; color: #FFFFFF;">XL</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">65 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">78 cm</td>
+              <td style="padding: 12px 8px; color: var(--text-dim);">25 cm</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<section id="reviews-section" style="max-width: 1400px; margin: 0 auto 120px; padding: 0 24px;">
+  <div style="background: var(--bg-card); border: 1px solid var(--border-hairline); border-radius: 24px; padding: clamp(24px, 4vw, 48px);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--border-hairline);">
+      <div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px;">
+          DOĞRULANMIŞ MÜŞTERİ DENEYİMLERİ
+        </div>
+        <h2 style="font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 900; text-transform: uppercase; color: #FFFFFF; line-height: 1.1;">
+          DEĞERLENDİRMELER & YORUMLAR
+        </h2>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 20px; background: #0E0F14; border: 1px solid var(--border-hairline); border-radius: 16px; padding: 16px 24px;">
+        <div style="font-family: var(--font-mono); font-size: 2.4rem; font-weight: 900; color: #FFFFFF; line-height: 1;">
+          {{ avg_rating }}
+        </div>
+        <div>
+          <div style="color: #F59E0B; font-size: 14px; letter-spacing: 2px; margin-bottom: 4px;">
+            {% for star in range(1, 6) %}
+              {% if star <= avg_rating|round(0, 'floor') %}★{% else %}<span style="color: rgba(255,255,255,0.18);">★</span>{% endif %}
+            {% endfor %}
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+            Toplam {{ rating_count }} Değerlendirme
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Yorum Yapma Koşulları & Form Alanı -->
+    {% if not current_user %}
+      <div style="background: rgba(36, 83, 255, 0.04); border: 1px solid rgba(36, 83, 255, 0.15); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 40px;">
+        <div style="font-size: 20px; margin-bottom: 8px;">🔒</div>
+        <div style="font-weight: 700; font-size: 15px; color: #FFFFFF; margin-bottom: 6px;">Yorum Yapmak İçin Giriş Yapın</div>
+        <p style="color: var(--text-dim); font-size: 13px; max-width: 480px; margin: 0 auto 16px;">
+          Güvenilir ve gerçek müşteri geri bildirimleri için sadece bu ürünü satın almış üyelerimiz değerlendirme yapabilmektedir.
+        </p>
+        <a href="/login?next=/product/{{ product['id'] }}" class="btn-drip-primary" style="padding: 10px 24px; font-size: 11px; display: inline-flex;">
+          GİRİŞ YAP / KAYIT OL →
+        </a>
+      </div>
+    {% elif not has_purchased %}
+      <div style="background: #11141C; border: 1px solid var(--border-hairline); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 40px;">
+        <div style="font-size: 20px; margin-bottom: 8px;">🏷️</div>
+        <div style="font-weight: 700; font-size: 15px; color: #FFFFFF; margin-bottom: 6px;">Yalnızca Satın Alan Üyeler Yorum Yapabilir</div>
+        <p style="color: var(--text-dim); font-size: 13px; max-width: 520px; margin: 0 auto;">
+          Topluluk standartlarımız gereği, bu ürünü henüz satın almadığınız için yorum formu kapalıdır. Sipariş verdikten sonra deneyiminizi fotoğraflı olarak paylaşabilirsiniz.
+        </p>
+      </div>
+    {% elif has_already_reviewed %}
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; gap: 14px; margin-bottom: 40px;">
+        <div style="color: #10B981; font-size: 20px;">✓</div>
+        <div>
+          <div style="font-weight: 700; font-size: 14px; color: #FFFFFF;">Bu ürün için değerlendirmeniz bulunmaktadır</div>
+          <div style="font-size: 12px; color: var(--text-dim); margin-top: 2px;">Değerli geri bildiriminiz için teşekkür ederiz.</div>
+        </div>
+      </div>
+    {% else %}
+      <!-- Satın Almış Üye İçin Yorum ve Fotoğraf Yükleme Formu -->
+      <div style="background: #0E0F14; border: 1px solid rgba(36,83,255,0.3); border-radius: 18px; padding: 28px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #FFFFFF;">
+              <span style="color: #10B981;">✓</span> DOĞRULANMIŞ ALICI OLARAK DEĞERLENDİRİN
+            </div>
+            <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+              Bu ürünü satın aldığınız için teşekkürler! Diğer müşterilere yardımcı olmak için puan verin ve fotoğraf ekleyin.
+            </div>
+          </div>
+        </div>
+
+        <form action="/product/{{ product['id'] }}/review" method="POST" enctype="multipart/form-data">
+          
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">
+              PUANINIZ (1 - 5 YILDIZ):
+            </label>
+            <div class="star-rating-select" style="display: inline-flex; flex-direction: row-reverse; gap: 6px; cursor: pointer;">
+              <input type="radio" id="star5" name="rating" value="5" checked style="display: none;">
+              <label for="star5" class="star-label" data-value="5" title="5 Yıldız - Mükemmel" style="font-size: 28px; color: #F59E0B; cursor: pointer; transition: transform 0.15s ease;">★</label>
+              
+              <input type="radio" id="star4" name="rating" value="4" style="display: none;">
+              <label for="star4" class="star-label" data-value="4" title="4 Yıldız - Çok İyi" style="font-size: 28px; color: #F59E0B; cursor: pointer; transition: transform 0.15s ease;">★</label>
+              
+              <input type="radio" id="star3" name="rating" value="3" style="display: none;">
+              <label for="star3" class="star-label" data-value="3" title="3 Yıldız - Orta" style="font-size: 28px; color: #F59E0B; cursor: pointer; transition: transform 0.15s ease;">★</label>
+              
+              <input type="radio" id="star2" name="rating" value="2" style="display: none;">
+              <label for="star2" class="star-label" data-value="2" title="2 Yıldız - Zayıf" style="font-size: 28px; color: #F59E0B; cursor: pointer; transition: transform 0.15s ease;">★</label>
+              
+              <input type="radio" id="star1" name="rating" value="1" style="display: none;">
+              <label for="star1" class="star-label" data-value="1" title="1 Yıldız - Kötü" style="font-size: 28px; color: #F59E0B; cursor: pointer; transition: transform 0.15s ease;">★</label>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">
+              DENEYİMİNİZ & YORUMUNUZ:
+            </label>
+            <textarea name="comment" required rows="3" class="form-control" placeholder="Kumaş kalitesi, beden uyumu, baskı ve hissiyat hakkındaki görüşlerinizi yazın..." style="width: 100%; resize: vertical;"></textarea>
+          </div>
+
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">
+              📷 ÜRÜN FOTOĞRAFI EKLE (OPSİYONEL):
+            </label>
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+              <input type="file" name="review_photo" id="reviewPhotoInput" accept="image/*" class="form-control" style="max-width: 360px; padding: 10px;">
+              <span style="font-size: 11px; color: var(--text-dim);">PNG, JPG veya WEBP (Max 5MB)</span>
+            </div>
+            <div id="reviewPhotoPreview" style="margin-top: 12px; display: none;">
+              <img id="reviewPhotoPreviewImg" src="" alt="Önizleme" style="max-width: 120px; max-height: 120px; border-radius: 8px; border: 1px solid var(--border-blue); object-fit: cover;">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-drip-primary" style="padding: 14px 32px; font-size: 12px;">
+            DEĞERLENDİRMEYİ YAYINLA →
+          </button>
+        </form>
+      </div>
+    {% endif %}
+
+    <!-- Yorum Listesi -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      {% if reviews %}
+        {% for rev in reviews %}
+          <div style="background: #0E0F14; border: 1px solid var(--border-hairline); border-radius: 16px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                  <strong style="color: #FFFFFF; font-size: 15px;">{{ rev['user_name']|mask_name }}</strong>
+                  <span style="background: rgba(16,185,129,0.15); color: #10B981; font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">
+                    ✓ Doğrulanmış Alıcı
+                  </span>
+                </div>
+                <div style="color: #F59E0B; font-size: 13px; letter-spacing: 2px;">
+                  {% for s in range(1, 6) %}
+                    {% if s <= rev['rating'] %}★{% else %}<span style="color: rgba(255,255,255,0.18);">★</span>{% endif %}
+                  {% endfor %}
+                </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+                  {{ rev['created_at'][:10] if rev['created_at'] else '' }}
+                </div>
+                {% if current_user and current_user['role'] == 'admin' %}
+                  <form action="/admin/review/{{ rev['id'] }}/delete" method="POST" onsubmit="return confirm('Bu yorumu silmek istediğinize emin misiniz?');" style="margin: 0;">
+                    <button type="submit" title="Yorumu Sil (Admin)" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #EF4444; border-radius: 8px; padding: 4px 10px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      Sil
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+
+            <p class="review-comment-text" style="font-size: 14px; color: var(--text-dim); line-height: 1.7;">
+              {{ rev['comment'] }}
+            </p>
+
+            {% if rev['photo_url'] %}
+              <div style="margin-top: 14px; display: inline-block;">
+                <img 
+                  src="{{ rev['photo_url'] }}" 
+                  alt="Müşteri Fotoğrafı" 
+                  class="review-photo-protected"
+                  draggable="false"
+                  oncontextmenu="return false;"
+                  style="width: 140px; height: 140px; border-radius: 10px; border: 1px solid var(--border-hairline); object-fit: cover; display: block; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 50px 20px; background: #0E0F14; border: 1px dashed var(--border-hairline); border-radius: 16px;">
+          <div style="font-size: 28px; margin-bottom: 10px; opacity: 0.5;">💬</div>
+          <div style="font-family: var(--font-display); font-size: 20px; font-weight: 800; color: #FFFFFF; text-transform: uppercase; margin-bottom: 6px;">
+            Henüz Değerlendirme Yapılmamış
+          </div>
+          <p style="color: var(--text-dim); font-size: 13px; max-width: 440px; margin: 0 auto;">
+            Bu ürünü satın alan ilk müşterimiz olarak deneyiminizi ve stilinizi ilk siz paylaşın!
+          </p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let selectedSize = 'M';
+  let selectedSizeStock = 25;
+  let selectedColor = "{{ product['color_name']|escape }}";
+  let currentMainImage = "{{ product['image_url'] }}";
+
+  function switchMainGalleryImage(thumbBtn, newSrc) {
+    const mainImg = document.getElementById('main-product-img');
+    const card3D = document.getElementById('tshirt-3d-card');
+    const toggle360Btn = document.getElementById('toggle-360-btn');
+    if (card3D) card3D.style.transform = 'rotateY(0deg)';
+    if (toggle360Btn) {
+      toggle360Btn.style.background = 'rgba(10, 12, 18, 0.9)';
+      toggle360Btn.style.color = '#FFFFFF';
+      toggle360Btn.innerHTML = '<span>🔄 360° ARKA / ÖN ÇEVİR</span>';
+    }
+
+    if (!mainImg || !newSrc) return;
+    mainImg.style.opacity = '0.3';
+    setTimeout(() => {
+      mainImg.src = newSrc;
+      currentMainImage = newSrc;
+      mainImg.style.opacity = '1';
+    }, 120);
+
+    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.borderColor = 'var(--border-hairline)';
+    });
+    if (thumbBtn) {
+      thumbBtn.classList.add('active');
+      thumbBtn.style.borderColor = 'var(--electric-blue)';
+    }
+  }
+
+  function selectProductColor(btn, colorName, colorImage) {
+    selectedColor = colorName;
+    const colorLabel = document.getElementById('selected-color-name');
+    if (colorLabel) colorLabel.textContent = colorName;
+
+    document.querySelectorAll('.product-color-swatch-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.borderColor = 'rgba(255,255,255,0.2)';
+      b.style.boxShadow = 'none';
+    });
+    if (btn) {
+      btn.classList.add('active');
+      btn.style.borderColor = 'var(--electric-blue)';
+      btn.style.boxShadow = '0 0 10px rgba(36,83,255,0.7)';
+    }
+
+    if (colorImage) {
+      switchMainGalleryImage(null, colorImage);
+    }
+  }
+
+  function applySizeSelection(size, stock, el) {
+    selectedSize = size;
+    selectedSizeStock = parseInt(stock, 10) || 0;
+    document.querySelectorAll('.size-pill-btn').forEach(btn => btn.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const labelEl = document.getElementById('selected-size-label');
+    const stockEl = document.getElementById('selected-size-stock');
+    const addBtn = document.getElementById('detail-add-btn');
+    const fastBuyBtn = document.getElementById('detail-fast-buy-btn');
+    if (labelEl) labelEl.textContent = size;
+    if (stockEl) {
+      if (selectedSizeStock <= 0) {
+        stockEl.textContent = '(Bu Beden Tükendi)';
+        stockEl.style.color = '#EF4444';
+      } else if (selectedSizeStock < 5) {
+        stockEl.textContent = `(Son ${selectedSizeStock} Adet Kaldı!)`;
+        stockEl.style.color = '#F59E0B';
+      } else {
+        stockEl.textContent = `(${selectedSizeStock} Adet Stokta)`;
+        stockEl.style.color = '#10B981';
+      }
+    }
+    if (addBtn) {
+      if (selectedSizeStock <= 0) {
+        addBtn.disabled = true;
+        addBtn.style.opacity = '0.5';
+        addBtn.style.cursor = 'not-allowed';
+        addBtn.textContent = 'SEÇİLEN BEDEN TÜKENDİ';
+      } else {
+        addBtn.disabled = false;
+        addBtn.style.opacity = '1';
+        addBtn.style.cursor = 'pointer';
+        addBtn.textContent = 'SEPETE EKLE';
+      }
+    }
+    if (fastBuyBtn) {
+      if (selectedSizeStock <= 0) {
+        fastBuyBtn.disabled = true;
+        fastBuyBtn.style.opacity = '0.5';
+        fastBuyBtn.style.cursor = 'not-allowed';
+      } else {
+        fastBuyBtn.disabled = false;
+        fastBuyBtn.style.opacity = '1';
+        fastBuyBtn.style.cursor = 'pointer';
+      }
+    }
+  }
+  function switchSizeTab(tab) {
+    const btnRecommend = document.getElementById('tab-btn-recommend');
+    const btnMeasure = document.getElementById('tab-btn-measure');
+    const contentRecommend = document.getElementById('size-content-recommend');
+    const contentMeasure = document.getElementById('size-content-measure');
+    if (tab === 'recommend') {
+      btnRecommend.style.fontWeight = '700';
+      btnRecommend.style.color = '#FFFFFF';
+      btnRecommend.style.borderBottom = '2px solid var(--electric-blue)';
+      btnMeasure.style.fontWeight = '500';
+      btnMeasure.style.color = 'var(--text-dim)';
+      btnMeasure.style.borderBottom = '2px solid transparent';
+      contentRecommend.style.display = 'block';
+      contentMeasure.style.display = 'none';
+    } else {
+      btnMeasure.style.fontWeight = '700';
+      btnMeasure.style.color = '#FFFFFF';
+      btnMeasure.style.borderBottom = '2px solid var(--electric-blue)';
+      btnRecommend.style.fontWeight = '500';
+      btnRecommend.style.color = 'var(--text-dim)';
+      btnRecommend.style.borderBottom = '2px solid transparent';
+      contentMeasure.style.display = 'block';
+      contentRecommend.style.display = 'none';
+    }
+  }
+  function openSizeChartModal() {
+    const tableEl = document.getElementById('size-content-recommend');
+    if (tableEl) {
+      tableEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  function handleDetailAddToCart() {
+    const dataEl = document.getElementById('product-detail-data');
+    if (!dataEl) return;
+    const id = parseInt(dataEl.dataset.id, 10);
+    const name = dataEl.dataset.name;
+    const price = parseFloat(dataEl.dataset.price);
+    const color = selectedColor || dataEl.dataset.color;
+    const image = currentMainImage || dataEl.dataset.image;
+    addToCart(id, name, price, color, selectedSize, image);
+  }
+  function handleDetailFastBuy() {
+    handleDetailAddToCart();
+    setTimeout(() => {
+      window.location.href = '/checkout';
+    }, 250);
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.product-color-swatch, .product-color-swatch-btn').forEach(el => {
+      if (el.dataset.hex) el.style.backgroundColor = el.dataset.hex;
+    });
+    const sizeBtns = document.querySelectorAll('.size-pill-btn');
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const size = this.getAttribute('data-size');
+        const stock = this.getAttribute('data-stock');
+        applySizeSelection(size, stock, this);
+      });
+    });
+    const activeBtn = document.querySelector('.size-pill-btn.active');
+    if (activeBtn) {
+      applySizeSelection(activeBtn.getAttribute('data-size'), activeBtn.getAttribute('data-stock'), activeBtn);
+    }
+
+    // Gallery thumbnail click listener
+    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const src = this.getAttribute('data-src');
+        if (src) switchMainGalleryImage(this, src);
+      });
+    });
+
+    // Color swatch click listener
+    document.querySelectorAll('.product-color-swatch-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const cName = this.getAttribute('data-color-name');
+        const cImg = this.getAttribute('data-img');
+        if (cName) selectProductColor(this, cName, cImg);
+      });
+    });
+
+    // Yorum fotoğraflarına sağ tıklamayı ve sürüklemeyi kesin olarak engelle
+    const reviewsSec = document.getElementById('reviews-section');
+    if (reviewsSec) {
+      reviewsSec.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'IMG' || e.target.classList.contains('review-photo-protected')) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      reviewsSec.addEventListener('dragstart', function(e) {
+        if (e.target.tagName === 'IMG') {
+          e.preventDefault();
+          return false;
+        }
+      });
+    }
+
+    const addBtn = document.getElementById('detail-add-btn');
+    if (addBtn) addBtn.addEventListener('click', handleDetailAddToCart);
+    const fastBuyBtn = document.getElementById('detail-fast-buy-btn');
+    if (fastBuyBtn) fastBuyBtn.addEventListener('click', handleDetailFastBuy);
+
+    const reviewPhotoInput = document.getElementById('reviewPhotoInput');
+    const reviewPhotoPreview = document.getElementById('reviewPhotoPreview');
+    const reviewPhotoPreviewImg = document.getElementById('reviewPhotoPreviewImg');
+    if (reviewPhotoInput && reviewPhotoPreview && reviewPhotoPreviewImg) {
+      reviewPhotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            reviewPhotoPreviewImg.src = evt.target.result;
+            reviewPhotoPreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          reviewPhotoPreview.style.display = 'none';
+        }
+      });
+    }
+
+    const starInputs = document.querySelectorAll('.star-rating-select input[type="radio"]');
+    const starLabels = document.querySelectorAll('.star-rating-select .star-label');
+    function updateStarVisuals(val) {
+      starLabels.forEach(lbl => {
+        const v = parseInt(lbl.dataset.value, 10);
+        if (v <= val) {
+          lbl.style.color = '#F59E0B';
+        } else {
+          lbl.style.color = 'rgba(255,255,255,0.2)';
+        }
+      });
+    }
+    starInputs.forEach(inp => {
+      inp.addEventListener('change', function() {
+        updateStarVisuals(parseInt(this.value, 10));
+      });
+    });
+    starLabels.forEach(lbl => {
+      lbl.addEventListener('mouseenter', function() {
+        updateStarVisuals(parseInt(this.dataset.value, 10));
+      });
+    });
+    const starContainer = document.querySelector('.star-rating-select');
+    if (starContainer) {
+      starContainer.addEventListener('mouseleave', function() {
+        const checked = document.querySelector('.star-rating-select input[type="radio"]:checked');
+        updateStarVisuals(checked ? parseInt(checked.value, 10) : 5);
+      });
+      const checked = document.querySelector('.star-rating-select input[type="radio"]:checked');
+      updateStarVisuals(checked ? parseInt(checked.value, 10) : 5);
+    }
+
+    // --- FOTOĞRAF YAKINLAŞTIRMA (ZOOM) VE BÜYÜTME (LIGHTBOX) ---
+    const zoomContainer = document.getElementById('product-zoom-container');
+    const zoomImg = document.getElementById('main-product-img');
+    const lightboxModal = document.getElementById('image-lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const openLightboxBtn = document.getElementById('open-lightbox-btn');
+    const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+
+    if (zoomContainer && zoomImg) {
+      zoomContainer.addEventListener('mousemove', function(e) {
+        const rect = zoomContainer.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        zoomImg.style.transformOrigin = `${x}% ${y}%`;
+        zoomImg.style.transform = 'scale(2.2)';
+      });
+
+      zoomContainer.addEventListener('mouseleave', function() {
+        zoomImg.style.transform = 'scale(1)';
+        zoomImg.style.transformOrigin = 'center center';
+      });
+
+      // Mobilde dokunmatik zoom
+      zoomContainer.addEventListener('click', function(e) {
+        if (e.target.closest('#open-lightbox-btn')) return;
+        openLightbox();
+      });
+    }
+
+    function openLightbox() {
+      if (lightboxModal && lightboxImg) {
+        lightboxImg.src = currentMainImage || (zoomImg ? zoomImg.src : '');
+        lightboxModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeLightbox() {
+      if (lightboxModal) {
+        lightboxModal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    if (openLightboxBtn) {
+      openLightboxBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openLightbox();
+      });
+    }
+
+    if (closeLightboxBtn) {
+      closeLightboxBtn.addEventListener('click', closeLightbox);
+    }
+
+    if (lightboxModal) {
+      lightboxModal.addEventListener('click', function(e) {
+        if (e.target === lightboxModal) closeLightbox();
+      });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && lightboxModal && lightboxModal.style.display === 'flex') {
+        closeLightbox();
+      }
+    });
+
+    // Global review photo lightbox opener
+    window.openReviewLightbox = function(url) {
+      if (lightboxImg && lightboxModal) {
+        lightboxImg.src = url;
+        lightboxModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    // --- 1. ÖN / ARKA ÇEVİRME SİSTEMİ ---
+    const toggle360Btn = document.getElementById('toggle-360-btn');
+    const frontImgUrl = "{{ product['image_url'] }}";
+    const backImgUrl = "{{ product['back_image_url'] or '' }}";
+    let isShowingBack = false;
+
+    if (toggle360Btn && backImgUrl) {
+      toggle360Btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isShowingBack = !isShowingBack;
+        if (zoomImg) {
+          zoomImg.style.opacity = '0.3';
+          setTimeout(() => {
+            zoomImg.src = isShowingBack ? backImgUrl : (currentMainImage || frontImgUrl);
+            zoomImg.style.opacity = '1';
+          }, 120);
+        }
+
+        if (isShowingBack) {
+          toggle360Btn.style.background = 'var(--electric-blue)';
+          toggle360Btn.style.color = '#FFFFFF';
+          toggle360Btn.innerHTML = '<span>🔄 ÖN YÜZE DÖN</span>';
+        } else {
+          toggle360Btn.style.background = 'rgba(10, 12, 18, 0.9)';
+          toggle360Btn.style.color = '#FFFFFF';
+          toggle360Btn.innerHTML = '<span>🔄 ÖN / ARKA ÇEVİR</span>';
+        }
+      });
+    }
+  });
+
+  // --- 5. AKILLI BEDEN HESAPLAYICI ---
+  function updateSmartSize() {
+    const h = parseInt(document.getElementById('smart-height-input').value, 10);
+    const w = parseInt(document.getElementById('smart-weight-input').value, 10);
+    const hVal = document.getElementById('height-val');
+    const wVal = document.getElementById('weight-val');
+    const recEl = document.getElementById('smart-size-recommendation');
+    if (hVal) hVal.textContent = h;
+    if (wVal) wVal.textContent = w;
+
+    let recSize = 'M';
+    if (w < 65 && h < 172) {
+      recSize = 'S';
+    } else if (w <= 78 && h <= 182) {
+      recSize = 'M';
+    } else if (w <= 90 && h <= 190) {
+      recSize = 'L';
+    } else {
+      recSize = 'XL';
+    }
+
+    if (recEl) {
+      recEl.innerHTML = `Öneri: <strong>${recSize} Beden</strong> (Oversize Döküm)`;
+    }
+
+    // İlgili bedeni otomatik seç
+    const targetBtn = document.querySelector(`.size-pill-btn[data-size="${recSize}"]`);
+    if (targetBtn && !targetBtn.classList.contains('out-of-stock')) {
+      targetBtn.click();
+    }
+  }
+
+</script>
+{% endblock %}

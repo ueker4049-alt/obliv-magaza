@@ -1,0 +1,2 @@
+[tool.pyright]
+extraPaths = ["C:/Users/Umut/AppData/Local/Programs/Python/Python313/Lib/site-packages"]

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}E-Posta Doğrulama | OBLIV{% endblock %}
+
+{% block content %}
+<div style="max-width: 460px; margin: 60px auto 140px; padding: 40px; background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 16px; text-align: center;">
+  
+  <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+    <div style="width: 60px; height: 60px; border-radius: 50%; background: #141622; border: 1.5px solid var(--electric-blue); display: flex; align-items: center; justify-content: center; color: var(--electric-blue);">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+    </div>
+  </div>
+
+  <h1 style="font-family: var(--font-display); font-size: 26px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 8px;">
+    E-POSTA DOĞRULAMA
+  </h1>
+  
+  <p style="font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 24px;">
+    <strong style="color: #FFFFFF;">{{ email }}</strong> adresinize 6 haneli bir güvenlik kodu iletildi. Lütfen kodu girerek kaydınızı tamamlayın.
+  </p>
+
+  <form method="POST" action="/verify-email">
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label class="form-label" for="verify-code" style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">
+        6 Haneli Güvenlik Kodu
+      </label>
+      <input 
+        type="text" 
+        id="verify-code" 
+        name="code" 
+        class="form-control" 
+        maxlength="6" 
+        required 
+        autocomplete="one-time-code"
+        placeholder="123456" 
+        style="text-align: center; font-family: var(--font-mono); font-size: 28px; font-weight: 800; letter-spacing: 0.3em; padding: 14px;">
+    </div>
+
+    <button type="submit" class="btn-drip-primary" style="width: 100%; justify-content: center; padding: 16px; font-size: 13px;">
+      KODU ONAYLA VE KAYDI TAMAMLA →
+    </button>
+  </form>
+
+  <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+    <button type="button" id="resend-code-btn" onclick="resendCode()" style="background: none; border: none; color: var(--electric-blue); font-family: var(--font-mono); font-weight: 700; cursor: pointer; text-decoration: underline;">
+      Kodu Tekrar Gönder
+    </button>
+    <a href="/register" style="color: var(--text-muted);">Farklı E-Posta Kullan</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  async function resendCode() {
+    const btn = document.getElementById('resend-code-btn');
+    btn.disabled = true;
+    btn.textContent = 'Kod Gönderiliyor...';
+    try {
+      const response = await fetch('/resend-verification-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await response.json();
+      alert(data.message || 'Kod tekrar gönderildi.');
+    } catch (e) {
+      alert('Kod gönderilirken bir hata oluştu.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Kodu Tekrar Gönder';
+    }
+  }
+
+</script>
+{% endblock %}

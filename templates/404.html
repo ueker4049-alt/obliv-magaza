@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Sayfa Bulunamadı (404) | OBLIV{% endblock %}
+
+{% block content %}
+<section style="min-height: 65vh; display: flex; align-items: center; justify-content: center; padding: 60px 24px; text-align: center;">
+  <div style="max-width: 580px; margin: 0 auto; background: #0E1017; border: 1px solid var(--border-hairline); border-radius: 20px; padding: 50px 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+    <div style="font-family: var(--font-display); font-size: clamp(4.5rem, 10vw, 7.5rem); font-weight: 900; line-height: 1; color: var(--electric-blue); text-shadow: 0 0 40px rgba(36, 83, 255, 0.45); margin-bottom: 12px;">
+      404
+    </div>
+    <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 800; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 16px;">
+      SAYFA BULUNAMADI // OBLIV ARCHIVE
+    </div>
+    <h1 style="font-family: var(--font-display); font-size: 26px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin-bottom: 14px;">
+      ARADIĞINIZ PARÇA MEVCUT DEĞİL
+    </h1>
+    <p style="font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 32px;">
+      Ulaşmaya çalıştığınız sayfa taşınmış, silinmiş veya geçici olarak yayından kaldırılmış olabilir. Yeni koleksiyonu keşfederek tarzınıza uygun parçaları bulabilirsiniz.
+    </p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <a href="/" class="btn-drip-primary" style="padding: 14px 28px; font-size: 12px;">
+        ANA SAYFAYA DÖN
+      </a>
+      <a href="/urunler" class="btn-drip-outline" style="padding: 14px 28px; font-size: 12px;">
+        KOLEKSİYONU KEŞFET →
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

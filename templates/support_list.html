@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Destek Taleplerim | OBLIV{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 40px auto 100px; padding: 0 24px;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; border-bottom: 1px solid var(--border-hairline); padding-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;">
+        OBLIV DOĞRUDAN DESTEK MERKEZİ
+      </span>
+      <h1 style="font-family: var(--font-display); font-size: 38px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 6px; color: #FFFFFF;">
+        {% if current_user['role'] == 'admin' %}DESTEK TALEPLERİ{% else %}DESTEK TALEPLERİM{% endif %}
+      </h1>
+      <p style="font-size: 14px; color: var(--text-dim); margin-top: 6px;">
+        Tüm soru, sipariş ve ürün taleplerinizi site üzerinden doğrudan yetkilimize iletebilir ve buradan canlı yanıt alabilirsiniz.
+      </p>
+    </div>
+
+    <a href="/support/new" class="btn-drip-primary" style="padding: 14px 28px; font-size: 12px;">
+      + YENİ DESTEK TALEBİ AÇ
+    </a>
+  </div>
+
+  {% if tickets %}
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      {% for t in tickets %}
+        <a href="/support/{{ t['ticket_number'] }}" style="text-decoration: none; color: inherit; display: block;">
+          <div style="background: #0E1016; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; flex-wrap: wrap; gap: 16px;" onmouseover="this.style.borderColor='var(--electric-blue)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-hairline)'; this.style.transform='none';">
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-family: var(--font-mono); font-size: 12px; font-weight: 800; color: var(--electric-blue);">
+                  #{{ t['ticket_number'] }}
+                </span>
+                <span style="background: rgba(37,99,235,0.15); border: 1px solid var(--electric-blue); color: #8BA0FF; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+                  {{ t['category'] }}
+                </span>
+                {% if current_user['role'] == 'admin' %}
+                  <span style="color: #FFFFFF; font-size: 12px; font-weight: 600;">
+                    👤 {{ t['customer_fullname'] or t['user_name'] }} ({{ t['user_email'] }})
+                  </span>
+                {% endif %}
+                {% if t['cargo_number'] %}
+                  <span style="background: rgba(37,99,235,0.12); border: 1px solid var(--electric-blue); color: #93C5FD; font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 4px;">
+                    🚚 Kargo No: {{ t['cargo_number'] }}
+                  </span>
+                {% endif %}
+                {% if t['video_url'] %}
+                  {% if t['video_url']|is_video %}
+                    <span style="background: #1F2433; color: #FCD34D; font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 4px;">
+                      📹 Videolu
+                    </span>
+                  {% else %}
+                    <span style="background: #1E293B; color: #38BDF8; font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 4px;">
+                      📸 Fotoğraflı
+                    </span>
+                  {% endif %}
+                {% endif %}
+              </div>
+
+              <div style="font-family: var(--font-display); font-size: 20px; font-weight: 900; color: #FFFFFF; letter-spacing: 0.02em;">
+                {{ t['subject'] }}
+              </div>
+
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+                Son Güncelleme: {{ t['updated_at'] }} • {{ t['message_count'] }} Mesaj
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+              {% if t['status'] == 'Açık' %}
+                <span class="ticket-badge ticket-status-open">{{ t['status'] }}</span>
+              {% elif t['status'] == 'Yetkili Yanıtladı' %}
+                <span class="ticket-badge ticket-status-agent">{{ t['status'] }}</span>
+              {% elif t['status'] == 'Müşteri Yanıtladı' %}
+                <span class="ticket-badge ticket-status-customer">{{ t['status'] }}</span>
+              {% else %}
+                <span class="ticket-badge ticket-status-closed">{{ t['status'] }}</span>
+              {% endif %}
+
+              <form action="/support/{{ t['ticket_number'] }}/delete" method="POST" style="margin: 0;" onsubmit="event.stopPropagation(); return confirm('#{{ t['ticket_number'] }} nolu destek talebini silmek istediğinize emin misiniz?');">
+                <button type="submit" onclick="event.stopPropagation();" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #EF4444; border-radius: 8px; padding: 6px 10px; font-size: 11px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#EF4444';this.style.color='#FFF'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='#EF4444'" title="Talebi Sil">
+                  🗑️ Sil
+                </button>
+              </form>
+
+              <span style="color: var(--electric-blue); font-size: 18px; font-weight: 900;">→</span>
+            </div>
+
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="background: #0E1016; border: 1px dashed var(--border-hairline); border-radius: 16px; padding: 70px 20px; text-align: center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--electric-blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; opacity: 0.6;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <h3 style="font-family: var(--font-display); font-size: 24px; font-weight: 900; color: #FFFFFF; text-transform: uppercase; margin-bottom: 8px;">
+        Destek Talebiniz Bulunmuyor
+      </h3>
+      <p style="font-size: 14px; color: var(--text-dim); max-width: 480px; margin: 0 auto 24px;">
+        Siparişiniz veya ürünlerinizle ilgili sorularınız için yeni bir destek talebi oluşturabilirsiniz.
+      </p>
+      <a href="/support/new" class="btn-drip-primary" style="display: inline-flex; padding: 14px 28px;">
+        Destek Talebi Oluştur
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

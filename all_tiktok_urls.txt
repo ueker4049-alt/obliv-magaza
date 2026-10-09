@@ -1,0 +1,2 @@
+https://sf-i18n-resources.tiktokcdn.com/obj/tiktok-webarch-solution-i18n-us
+https://sf-tcc-config.tiktokcdn.com/obj/tcc-config-web-alisg/

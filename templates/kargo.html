@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Kargo, Teslimat & İade Politikası | OBLIV{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 60px auto 140px; padding: 0 24px;">
+  
+  <div style="text-align: center; margin-bottom: 50px;">
+    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(36,83,255,0.1); border: 1px solid var(--border-blue); border-radius: 999px; padding: 6px 18px; margin-bottom: 16px;">
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;">ŞEFFAF & GÜVENİLİR</span>
+    </div>
+    <h1 style="font-family: var(--font-display); font-size: clamp(2.4rem, 4.5vw, 3.8rem); font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; color: #FFFFFF; line-height: 1.1; margin-bottom: 14px;">
+      KARGO, TESLİMAT VE İADE
+    </h1>
+    <p style="font-size: 15px; color: var(--text-dim); max-width: 600px; margin: 0 auto; line-height: 1.7;">
+      Tüm siparişlerinizde sigortalı gönderim, korumalı özel ambalaj ve tüketici haklarına saygılı yasal iade süreci geçerlidir.
+    </p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Kargo ve Gönderim -->
+    <div class="quality-card-luxury">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <span style="font-size: 22px;">📦</span>
+        <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0;">
+          HAZIRLIK VE GÖNDERİM SÜRESİ
+        </h2>
+      </div>
+      <p style="color: var(--text-dim); font-size: 14px; line-height: 1.8; margin-bottom: 12px;">
+        Hafta içi saat 15:00'e kadar onaylanan siparişleriniz aynı gün veya en geç <strong style="color: #FFFFFF;">1 iş günü</strong> içerisinde özenle paketlenir. Sınırlı drop ve yoğun kampanya dönemlerinde hazırlık süresi en fazla 2 iş günüdür.
+      </p>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-hairline); font-family: var(--font-mono); font-size: 12px; color: var(--electric-blue);">
+        <span>✓ Hızlı ve Güvenilir Teslimat</span>
+        <span>✓ Sigortalı Taşıma</span>
+        <span>✓ SMS & E-Posta Takip</span>
+      </div>
+    </div>
+
+    <!-- Teslimat & Anlaşmalı Kargo -->
+    <div class="quality-card-luxury">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <span style="font-size: 22px;">🚚</span>
+        <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0;">
+          ANLAŞMALI KARGO VE TESLİMAT SÜRESİ
+        </h2>
+      </div>
+      <p style="color: var(--text-dim); font-size: 14px; line-height: 1.8; margin-bottom: 12px;">
+        Türkiye'nin her noktasına <strong style="color: #FFFFFF;">Yurtiçi Kargo</strong> güvencesiyle gönderim yapılmaktadır. İstanbul, Ankara, İzmir gibi büyükşehir merkezlerine genellikle <strong style="color: #FFFFFF;">24–48 saat</strong>, diğer il ve ilçelere ise 2–4 iş günü içinde teslimat sağlanır.
+      </p>
+      <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6;">
+        Kargonuz yola çıktığında takip kodunuz e-posta ve SMS ile anında paylaşılır; canlı olarak kargo takibi yapabilirsiniz.
+      </p>
+    </div>
+
+    <!-- Yasal İade ve Değişim -->
+    <div class="quality-card-luxury">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <span style="font-size: 22px;">🔄</span>
+        <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0;">
+          14 GÜN KOŞULSUZ YASAL İADE HAKKI
+        </h2>
+      </div>
+      <p style="color: var(--text-dim); font-size: 14px; line-height: 1.8; margin-bottom: 12px;">
+        6502 sayılı Tüketicinin Korunması Hakkında Kanun kapsamında, teslim aldığınız tarihten itibaren <strong style="color: #FFFFFF;">14 gün içinde</strong> hiçbir gerekçe göstermeksizin cayma ve iade hakkınız mevcuttur.
+      </p>
+      <ul style="color: var(--text-dim); font-size: 13px; line-height: 1.8; margin-left: 20px; margin-bottom: 16px;">
+        <li>Ürünün kullanılmamış, yıkanmamış, etiketi sökülmemiş ve tekrar satılabilir formda olması gerekir.</li>
+        <li>İade talebinizi <a href="/support" style="color: var(--electric-blue); font-weight: 700;">Destek Paneli</a> üzerinden veya <a href="mailto:oblivwear@gmail.com" style="color: var(--electric-blue); font-weight: 700;">oblivwear@gmail.com</a> adresine sipariş numaranızla iletebilirsiniz.</li>
+        <li>Talebiniz incelendikten sonra tarafınıza verilecek ücretsiz iade kargo koduyla ürünü kolayca geri gönderebilirsiniz.</li>
+      </ul>
+      <div style="background: rgba(36,83,255,0.06); border: 1px solid var(--border-blue); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #93C5FD;">
+        💳 İade edilen ürün depomuza ulaşıp kontrol edildikten sonra en geç <strong>3 iş günü</strong> içerisinde ödemeniz kartınıza iade edilir.
+      </div>
+    </div>
+
+    <!-- Ambalaj & Kalite -->
+    <div class="quality-card-luxury">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <span style="font-size: 22px;">🛡️</span>
+        <h2 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin: 0;">
+          ZIRHLI MAT KORUYUCU AMBALAJ
+        </h2>
+      </div>
+      <p style="color: var(--text-dim); font-size: 14px; line-height: 1.8; margin-bottom: 0;">
+        Her OBLIV t-shirt'ü, neme ve toza dayanıklı özel kalın mat kilitli ambalajında, koruyucu dış kargo paketi ile sevk edilir. Kargoda ezilme, kirlenme veya form bozulması kesinlikle yaşanmaz.
+      </p>
+    </div>
+
+  </div>
+
+  <div style="text-align: center; margin-top: 48px;">
+    <a href="/urunler" class="btn-drip-primary" style="padding: 16px 36px; font-size: 12px;">
+      KOLEKSİYONU İNCELE →
+    </a>
+  </div>
+
+</div>
+{% endblock %}

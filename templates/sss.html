@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Sıkça Sorulan Sorular — OBLIV{% endblock %}
+{% block content %}
+<div style="max-width: 800px; margin: 60px auto; padding: 0 24px;">
+  <h1 style="font-family: var(--font-mono); font-size: 13px; color: var(--electric-blue); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px;">SSS</h1>
+  <p style="font-size: 28px; font-weight: 700; color: #FFF; margin-bottom: 40px;">Sıkça Sorulan Sorular</p>
+
+  <div style="display: flex; flex-direction: column; gap: 16px;" id="faq-list">
+
+    <details style="background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 0; overflow: hidden;">
+      <summary style="padding: 22px 28px; cursor: pointer; font-size: 15px; font-weight: 600; color: #FFF; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+        Beden tablosu var mı?
+        <span style="font-size: 18px; color: var(--electric-blue);">+</span>
+      </summary>
+      <p style="padding: 0 28px 22px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0;">Ürün sayfalarında her ürün için ayrı beden tablosu bulunmaktadır. Genel olarak oversize kesim üretildiğinden bir beden küçük almanızı öneririz. Emin değilseniz <a href="/support" style="color: var(--electric-blue);">bize sorun</a>.</p>
+    </details>
+
+    <details style="background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 0; overflow: hidden;">
+      <summary style="padding: 22px 28px; cursor: pointer; font-size: 15px; font-weight: 600; color: #FFF; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+        Ödeme yöntemleri neler?
+        <span style="font-size: 18px; color: var(--electric-blue);">+</span>
+      </summary>
+      <p style="padding: 0 28px 22px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0;">Siparişlerinizi doğrudan 7/24 Havale / FAST ile IBAN numaramıza transfer ederek 0 komisyonla tamamlayabilirsiniz.</p>
+    </details>
+
+    <details style="background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 0; overflow: hidden;">
+      <summary style="padding: 22px 28px; cursor: pointer; font-size: 15px; font-weight: 600; color: #FFF; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+        Siparişimi nasıl takip ederim?
+        <span style="font-size: 18px; color: var(--electric-blue);">+</span>
+      </summary>
+      <p style="padding: 0 28px 22px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0;">Sipariş kargoya verildikten sonra e-posta adresinize kargo takip numarası gönderilir. <a href="/account" style="color: var(--electric-blue);">Hesabım</a> sayfasından da siparişlerinizi görüntüleyebilirsiniz.</p>
+    </details>
+
+    <details style="background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 0; overflow: hidden;">
+      <summary style="padding: 22px 28px; cursor: pointer; font-size: 15px; font-weight: 600; color: #FFF; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+        İade nasıl yapılır?
+        <span style="font-size: 18px; color: var(--electric-blue);">+</span>
+      </summary>
+      <p style="padding: 0 28px 22px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0;">Teslimattan itibaren 14 gün içinde, ürün kullanılmamış ve etiketliyse iade kabul edilir. <a href="/support" style="color: var(--electric-blue);">Destek talebi</a> oluşturarak süreci başlatabilirsiniz.</p>
+    </details>
+
+    <details style="background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 0; overflow: hidden;">
+      <summary style="padding: 22px 28px; cursor: pointer; font-size: 15px; font-weight: 600; color: #FFF; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+        Kumaş kalitesi nasıl?
+        <span style="font-size: 18px; color: var(--electric-blue);">+</span>
+      </summary>
+      <p style="padding: 0 28px 22px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0;">Tüm ürünlerimiz yüksek gramajlı, sertifikalı kumaşlardan üretilmektedir. Ürün sayfasında kumaş detaylarını bulabilirsiniz.</p>
+    </details>
+
+  </div>
+
+  <div style="margin-top: 40px; text-align: center; padding: 28px; background: #0D0F14; border: 1px solid var(--border-hairline); border-radius: 12px;">
+    <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 16px;">Cevabını bulamadın mı?</p>
+    <a href="/support" style="display: inline-block; background: var(--electric-blue); color: #FFF; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none;">Bize Yaz</a>
+  </div>
+</div>
+{% endblock %}

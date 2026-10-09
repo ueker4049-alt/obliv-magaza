@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Destek Talebi | OBLIV{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 50px auto 120px; padding: 0 24px;">
+
+  <div style="margin-bottom: 30px;">
+    <a href="/support" style="color: var(--text-dim); text-decoration: none; font-family: var(--font-mono); font-size: 12px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+      ← Taleplerime Dön
+    </a>
+    <span style="display: block; font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;">
+      BİREBİR YETKİLİ DESTEĞİ
+    </span>
+    <h1 style="font-family: var(--font-display); font-size: 36px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; color: #FFFFFF;">
+      YENİ DESTEK TALEBİ AÇ
+    </h1>
+    <p style="font-size: 14px; color: var(--text-dim); line-height: 1.6;">
+      Talebiniz doğrudan mağaza yetkilimize düşer. Yazışmalar e-posta yerine doğrudan bu panel üzerinden güvenle gerçekleşir.
+    </p>
+  </div>
+
+  <div style="background: #0E1016; border: 1px solid var(--border-hairline); border-radius: 16px; padding: 36px;">
+    <form action="/support/new" method="POST" enctype="multipart/form-data">
+      
+      
+      <div class="form-group" style="margin-bottom: 22px;">
+        <label class="form-label">Adınız ve Soyadınız *</label>
+        <input type="text" name="customer_fullname" class="form-control" value="{{ current_user['name'] if current_user else '' }}" placeholder="Örn: Ahmet Yılmaz" required>
+      </div>
+
+      
+      <div class="form-group" style="margin-bottom: 22px;">
+        <label class="form-label">Konu / Talep Başlığı *</label>
+        <input type="text" name="subject" class="form-control" placeholder="Örn: Kargo teslimat süresi veya kumaş gramajı hakkında" required>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
+        
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Destek Kategorisi *</label>
+          <select name="category" id="ticket-category-select" class="form-control" onchange="toggleCargoField()" required>
+            <option value="Kargo Takip & Teslimat">Kargo Takip & Teslimat</option>
+            <option value="Ödeme & Fatura">Ödeme & Fatura</option>
+            <option value="Ürün & Kumaş Kalitesi">Ürün & Kumaş Kalitesi</option>
+            <option value="Genel Bilgi">Genel Bilgi</option>
+            <option value="Diğer Bilgi">Diğer Bilgi</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Öncelik Seviyesi</label>
+          <select name="priority" class="form-control">
+            <option value="Normal">Normal</option>
+            <option value="Yüksek">Yüksek (Acil Durum)</option>
+            <option value="Düşük">Düşük</option>
+          </select>
+        </div>
+      </div>
+
+      
+      <div id="cargo-number-group" class="form-group" style="margin-bottom: 22px; background: rgba(37,99,235,0.06); border: 1px dashed var(--electric-blue); border-radius: 12px; padding: 18px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <span style="color: var(--electric-blue); font-size: 16px;">🚚</span>
+          <label class="form-label" style="margin-bottom: 0; color: #FFFFFF; font-weight: 700;">Kargo Takip Numarası *</label>
+        </div>
+        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px;">
+          Kargo ile alakalı destek taleplerinde kargonuzun takibinin yapılabilmesi için takip numaranızı girmeniz gerekmektedir.
+        </p>
+        <input type="text" name="cargo_number" id="cargo-number-input" class="form-control" placeholder="Örn: 123456789012 (Yurtiçi / MNG Kargo Takip No)" required>
+      </div>
+
+      
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label">Açıklama / Mesajınız *</label>
+        <textarea name="message" class="form-control" rows="5" placeholder="Yetkiliye iletmek istediğiniz detayları detaylıca belirtin..." required></textarea>
+      </div>
+
+      
+      <div class="form-group" style="margin-bottom: 28px; background: #121520; border: 1px solid var(--border-hairline); border-radius: 12px; padding: 18px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <label class="form-label" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px; color: #FFFFFF;">
+            <span>📸 / 📹 Fotoğraf veya Video Ekle</span>
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); font-weight: normal;">(Opsiyonel)</span>
+          </label>
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--electric-blue); font-weight: 700;">PNG, JPG, MP4, WEBM, MOV</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px;">
+          Yetkilimize durumu göstermek için ürün/paket fotoğrafı veya videosu yükleyebilirsiniz.
+        </p>
+        <input type="file" name="ticket_media" accept="image/png,image/jpeg,image/webp,image/gif,image/*,video/mp4,video/webm,video/mov,video/quicktime,video/x-matroska,video/*" class="form-control" style="padding: 10px; background: #0A0C10; cursor: pointer;">
+      </div>
+
+      <div style="display: flex; gap: 14px; align-items: center;">
+        <button type="submit" class="btn-drip-primary" style="padding: 16px 36px; font-size: 13px;">
+          TALEBİ GÖNDER VE YETKİLİYE İLET →
+        </button>
+        <a href="/support" class="btn-drip-outline" style="padding: 16px 24px; font-size: 13px;">
+          Vazgeç
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<script>
+function toggleCargoField() {
+  const categorySelect = document.getElementById('ticket-category-select');
+  const cargoGroup = document.getElementById('cargo-number-group');
+  const cargoInput = document.getElementById('cargo-number-input');
+  if (categorySelect.value === 'Kargo Takip & Teslimat') {
+    cargoGroup.style.display = 'block';
+    cargoInput.required = true;
+  } else {
+    cargoGroup.style.display = 'none';
+    cargoInput.required = false;
+    cargoInput.value = '';
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  toggleCargoField();
+});
+
+</script>
+{% endblock %}

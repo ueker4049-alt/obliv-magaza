@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Siparişiniz Alındı | OBLIV{% endblock %}
+
+{% block content %}
+<section style="max-width: 640px; margin: 60px auto 140px; padding: 0 24px; text-align: center;">
+  <div style="width: 64px; height: 64px; background: #0A1B38; border: 2px solid var(--electric-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; color: #FFFFFF;">
+    ✓
+  </div>
+
+  <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; font-weight: 700; color: var(--electric-blue); text-transform: uppercase;">
+    ÖDEME BAŞARILI • SİPARİŞ KODU
+  </span>
+  <h1 style="font-family: var(--font-mono); font-size: 32px; font-weight: 900; margin: 8px 0 16px; color: #FFFFFF;">
+    #{{ order['order_number'] }}
+  </h1>
+
+  <p style="font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 30px;">
+    Tebrikler <strong>{{ order['customer_name'] }}</strong>, siparişiniz başarıyla alındı ve OBLIV paketleme ekibine iletildi. Detaylar <strong>{{ order['customer_email'] }}</strong> adresine gönderildi.
+  </p>
+
+  <div style="background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 24px; text-align: left; margin-bottom: 30px;">
+    <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 14px; border-bottom: 1px solid var(--border-hairline); padding-bottom: 8px; color: #FFFFFF;">
+      SİPARİŞ VE ÖDEME DETAYLARI
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Ödeme Yöntemi:</span>
+        <span style="font-family: var(--font-mono); font-weight: 700;">
+          {% if order['card_last4'] == 'IYZICO' %}
+            💳 İyzico ile Güvenli Kart Ödemesi
+          {% elif order['card_last4'] == 'HAVALE/FAST' or order['card_last4'] == 'HAVALE' %}
+            🏦 Havale / FAST ile Ödeme
+          {% else %}
+            💳 {{ order['card_last4'] }}
+          {% endif %}
+        </span>
+      </div>
+      {% if 'Havale' in order['payment_status'] or order['card_last4'] == 'HAVALE/FAST' %}
+      <div style="background: rgba(36, 83, 255, 0.08); border: 1px solid var(--border-blue); border-radius: 10px; padding: 14px; margin: 6px 0;">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; margin-bottom: 6px;">
+          📌 ÖDEME GÖNDERİLECEK IBAN BİLGİSİ:
+        </div>
+        <div style="font-size: 13px; color: #FFF; margin-bottom: 2px;"><strong>Alıcı:</strong> {{ settings.get('bank_account_holder', 'Mustafa Umut Eker') }}</div>
+        <div style="font-size: 13px; color: #FFF; margin-bottom: 6px;"><strong>Banka:</strong> {{ settings.get('bank_name', 'Ziraat Bankası') }}</div>
+        <div style="font-family: var(--font-mono); font-size: 13px; color: #60A5FA; font-weight: 700; word-break: break-all;">
+          {{ settings.get('bank_iban', 'TR59 0001 0090 1118 4713 7050 01') }}
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+          * Havale/FAST açıklamasına <strong>#{{ order['order_number'] }}</strong> sipariş kodunuzu yazmanız yeterlidir.
+        </div>
+      </div>
+      {% endif %}
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Ödeme Durumu:</span>
+        <span style="font-family: var(--font-mono); font-weight: 700; color: #10B981;">
+          {{ order['payment_status'] }}
+        </span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Kargo Durumu:</span>
+        <span style="font-family: var(--font-mono); color: var(--electric-blue); font-weight: 700;">{{ order['order_status'] }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted);">Teslimat Adresi:</span>
+        <span style="max-width: 300px; text-align: right; color: var(--text-dim);">{{ order['shipping_address'] }}, {{ order['city'] }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-hairline); padding-top: 12px; margin-top: 4px;">
+        <span style="font-family: var(--font-display); font-size: 18px; font-weight: 900; text-transform: uppercase;">TOPLAM TUTAR:</span>
+        <span style="font-family: var(--font-mono); font-size: 18px; font-weight: 800; color: #FFFFFF;">{{ "%.2f"|format(order['total_amount']) }} ₺</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 12px; justify-content: center;">
+    <a href="/" class="btn-drip-primary" style="font-size: 12px; padding: 14px 28px;">ALIŞVERİŞE DEVAM ET →</a>
+    <a href="/profile" class="btn-drip-outline" style="font-size: 12px; padding: 14px 28px;">SİPARİŞLERİM</a>
+  </div>
+</section>
+{% endblock %}

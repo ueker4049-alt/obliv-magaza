@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}Ürün & Fotoğraf Düzenle | OBLIV Admin{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 40px auto 140px; padding: 0 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+    <div>
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">ÜRÜN VE FOTOĞRAF EDİTÖRÜ</span>
+      <h1 style="font-family: var(--font-display); font-size: 36px; font-weight: 900; text-transform: uppercase;">
+        {{ product['name'] }}
+      </h1>
+    </div>
+    <a href="/admin#tab-products" class="btn-drip-outline" style="font-size: 11px; padding: 12px 20px;">
+      ← Ürün Listesine Dön
+    </a>
+  </div>
+
+  <div style="background: #0F1014; border: 1px solid var(--border-hairline); border-radius: 18px; padding: 36px;">
+    <form method="POST" action="/admin/products/edit/{{ product['id'] }}" enctype="multipart/form-data">
+      <input type="hidden" name="current_image" value="{{ product['image_url'] }}">
+
+      <!-- FOTOĞRAF GALERİSİ VE YÖNETİMİ -->
+      <div style="background: #141720; border: 1px solid var(--electric-blue); border-radius: 14px; padding: 24px; margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <strong style="font-family: var(--font-mono); font-size: 12px; color: #FFFFFF; text-transform: uppercase;">
+            📸 MEVCUT VE YENİ ÜRÜN FOTOĞRAFLARI (GALERİ)
+          </strong>
+          <span style="background: var(--electric-blue); color: #FFFFFF; font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 999px;">
+            ÇOKLU GÖRSEL DESTEĞİ AKTİF
+          </span>
+        </div>
+
+        <!-- Mevcut Galeri Görselleri -->
+        <label class="form-label" style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: block;">
+          Mevcut Fotoğraflar (Ürüne Ekli)
+        </label>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px;" id="existing-images-row">
+          {% if images %}
+            {% for img in images %}
+              <div style="background: #000; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 8px; position: relative; width: 110px; text-align: center;" id="img-card-{{ img['id'] }}">
+                <img src="{{ img['image_url'] }}" alt="Foto" style="width: 100%; height: 95px; object-fit: contain; margin-bottom: 4px; border-radius: 6px;">
+                {% if img['image_url'] == product['image_url'] %}
+                  <span style="font-family: var(--font-mono); font-size: 9px; color: var(--electric-blue); font-weight: 700; display: block;">KAPAK</span>
+                {% else %}
+                  <button type="button" class="btn-delete-img" data-img-id="{{ img['id'] }}" style="background: rgba(239,68,68,0.2); border: 1px solid #EF4444; color: #FCA5A5; font-size: 10px; padding: 3px 8px; border-radius: 4px; cursor: pointer; width: 100%;">
+                    Sil 🗑️
+                  </button>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <div style="background: #000; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 8px; width: 110px; text-align: center;">
+              <img src="{{ product['image_url'] }}" alt="Mevcut Görsel" style="width: 100%; height: 95px; object-fit: contain; margin-bottom: 4px;">
+              <span style="font-family: var(--font-mono); font-size: 9px; color: var(--electric-blue); font-weight: 700; display: block;">KAPAK</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label">Ana Kapak Fotoğrafını Değiştir</label>
+            <input type="file" name="product_photo" accept="image/*" class="form-control" style="padding: 10px;">
+          </div>
+          <div>
+            <label class="form-label">veya Şablon Seç</label>
+            <select name="preset_image" class="form-control">
+              <option value="CURRENT">-- Mevcut Görseli Koru --</option>
+              <option value="/static/images/tshirt_black.svg">OBLIV Siyah Heavyweight T-Shirt</option>
+              <option value="/static/images/tshirt_white.svg">OBLIV Kırık Beyaz Heavyweight T-Shirt</option>
+              <option value="/static/images/tshirt_sage.svg">OBLIV Adaçayı Heavyweight T-Shirt</option>
+              <option value="/static/images/tshirt_taupe.svg">OBLIV Vizon Heavyweight T-Shirt</option>
+              <option value="/static/images/tshirt_steel.svg">OBLIV Çelik Mavi Heavyweight T-Shirt</option>
+              <option value="/static/images/tshirt_terracotta.svg">OBLIV Kiremit Heavyweight T-Shirt</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 360 Dönüş İçin Tişörtün Arka Yüzü Fotoğrafı -->
+        <div style="background: rgba(36, 83, 255, 0.06); border: 1px solid rgba(36, 83, 255, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <input type="hidden" name="current_back_image" value="{{ product['back_image_url'] or '' }}">
+          <label class="form-label" style="color: #FFFFFF; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+            <span>🔄 Tişörtün Arka Yüzü Fotoğrafı (360° Çevirme İçin)</span>
+            {% if product['back_image_url'] %}
+              <span style="font-size: 11px; color: #10B981;">✓ Arka fotoğraf yüklü</span>
+            {% endif %}
+          </label>
+          <div style="display: flex; gap: 14px; align-items: center; margin-top: 8px;">
+            {% if product['back_image_url'] %}
+              <img src="{{ product['back_image_url'] }}" alt="Arka Görsel" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #000; border: 1px solid var(--border-hairline);">
+            {% endif %}
+            <input type="file" name="back_photo" accept="image/*" class="form-control" style="padding: 10px; flex-grow: 1;">
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+            * 360° döndürme modunda kapak fotoğrafı kendi ekseninde çevrildiğinde tişörtün bu arka yüzü görüntülenir.
+          </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px dashed var(--border-blue); border-radius: 10px; padding: 14px;">
+          <label class="form-label" style="color: #FFFFFF; font-weight: 700; margin-bottom: 4px; display: block;">
+            + Galeriye Yeni Fotoğraflar Ekle (Çoklu Seçim)
+          </label>
+          <input type="file" name="extra_photos" accept="image/*" multiple class="form-control" style="padding: 10px;">
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+            * Ctrl tuşuna basarak birden fazla fotoğraf seçebilirsiniz. Yüklediğiniz görseller mevcut galeriye eklenecektir.
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Model İsmi</label>
+          <input type="text" name="name" class="form-control" required value="{{ product['name'] }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select name="category" class="form-control">
+            <option value="{{ product['category'] }}" selected>{{ product['category'] }}</option>
+            <option value="T-Shirt">T-Shirt</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Fiyat (₺)</label>
+          <input type="number" step="0.01" name="price" class="form-control" required value="{{ product['price'] }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">İndirimsiz Fiyat (₺)</label>
+          <input type="number" step="0.01" name="old_price" class="form-control" value="{{ product['old_price'] if product['old_price'] else '' }}">
+        </div>
+      </div>
+
+      
+      <div style="background: #11141C; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+        <label class="form-label" style="color: var(--electric-blue); font-weight: 800; margin-bottom: 12px; display: block;">
+          📦 BEDENLERE GÖRE AYRI STOK ADETLERİ
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 10px; color: #FFFFFF;">S BEDEN</label>
+            <input type="number" name="stock_s" class="form-control" value="{{ product['stock_s'] if product['stock_s'] is not none else 15 }}" min="0" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 10px; color: #FFFFFF;">M BEDEN</label>
+            <input type="number" name="stock_m" class="form-control" value="{{ product['stock_m'] if product['stock_m'] is not none else 25 }}" min="0" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 10px; color: #FFFFFF;">L BEDEN</label>
+            <input type="number" name="stock_l" class="form-control" value="{{ product['stock_l'] if product['stock_l'] is not none else 20 }}" min="0" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 10px; color: #FFFFFF;">XL BEDEN</label>
+            <input type="number" name="stock_xl" class="form-control" value="{{ product['stock_xl'] if product['stock_xl'] is not none else 10 }}" min="0" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- RENK SEÇENEKLERİ YÖNETİMİ -->
+      <div style="background: #11141C; border: 1px solid var(--border-hairline); border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <label class="form-label" style="color: var(--electric-blue); font-weight: 800; margin-bottom: 0;">
+            🎨 RENK SEÇENEKLERİ & VARYASYONLAR
+          </label>
+          <button type="button" onclick="addEditColorRow()" style="background: rgba(36,83,255,0.15); border: 1px solid var(--electric-blue); color: #FFF; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; cursor: pointer;">
+            + Ek Renk Ekle
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 12px; align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Ana Renk Adı</label>
+            <input type="text" name="color_name" class="form-control" required value="{{ product['color_name'] }}">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Düz Renk Kodu</label>
+            <input type="color" name="color_hex" class="form-control" value="{{ product['color_hex'] }}" style="height: 48px; padding: 2px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Etiket / Rozet</label>
+            <input type="text" name="badge" class="form-control" value="{{ product['badge'] if product['badge'] else '' }}">
+          </div>
+        </div>
+
+        <div id="edit-extra-colors-container">
+          {% if colors %}
+            {% for c in colors %}
+              {% if loop.index > 1 %}
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr 1.5fr 40px; gap: 14px; margin-top: 12px; align-items: end; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-hairline);">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 11px;">Ek Renk Adı</label>
+                    <input type="text" name="extra_color_name[]" class="form-control" value="{{ c['color_name'] }}" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 11px;">Renk Kodu</label>
+                    <input type="color" name="extra_color_hex[]" class="form-control" value="{{ c['color_hex'] }}" style="height: 48px; padding: 2px;">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 11px;">Renge Özel Fotoğraf</label>
+                    <input type="hidden" name="extra_color_existing_image[]" value="{{ c['image_url'] or '' }}">
+                    <input type="file" name="extra_color_photo[]" accept="image/*" class="form-control" style="padding: 9px; font-size: 11px;">
+                    {% if c['image_url'] and c['image_url'] != product['image_url'] %}
+                      <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                        <img src="{{ c['image_url'] }}" alt="" style="width: 22px; height: 22px; object-fit: contain; border-radius: 4px; background: #000;">
+                        <span style="font-size: 10px; color: #10B981;">Özel fotoğraf yüklü</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <button type="button" onclick="this.parentElement.remove()" style="height: 48px; background: rgba(239,68,68,0.15); border: 1px solid #EF4444; color: #FCA5A5; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;" title="Rengi Sil">
+                    &times;
+                  </button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ürün Açıklaması</label>
+        <textarea name="description" class="form-control" rows="3">{{ product['description'] }}</textarea>
+      </div>
+
+      <div style="background: rgba(36, 83, 255, 0.08); border: 1px solid rgba(36, 83, 255, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-weight: 700; font-size: 14px; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+            <span>⭐</span> Ürünü Öne Çıkar (Anasayfada Göster)
+          </div>
+          <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+            Bu seçenek açıldığında ürün anasayfadaki "Öne Çıkan Ürünler" vitrininde yer alır.
+          </div>
+        </div>
+        <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+          <input type="checkbox" name="is_featured" value="1" {% if product['is_featured'] %}checked{% endif %} style="opacity: 0; width: 0; height: 0;" id="isFeaturedEditToggle">
+          <span class="edit-toggle-slider {% if product['is_featured'] %}slider-featured{% endif %}" id="isFeaturedEditSlider"></span>
+        </label>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-weight: 700; font-size: 14px; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+            <span>🔄</span> 360° Döndürme Modunu Aktif Et
+          </div>
+          <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+            Sadece bu ayar açıldığında ürün sayfasında 360° döndürme butonu gözükür. Açılmadığı sürece kötü durmaması için gizli kalır.
+          </div>
+        </div>
+        <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+          <input type="checkbox" name="has_360" value="1" {% if product['has_360'] %}checked{% endif %} style="opacity: 0; width: 0; height: 0;" id="has360EditToggle">
+          <span class="edit-toggle-slider {% if product['has_360'] %}slider-360{% endif %}" id="has360EditSlider"></span>
+        </label>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+          <span>↕</span> Ürün Gösterim Sırası (Display Order)
+        </label>
+        <input type="number" name="display_order" class="form-control" value="{{ product['display_order'] or 0 }}" min="0" style="max-width: 200px; font-family: var(--font-mono); font-weight: 800; color: #60A5FA;">
+        <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+          Küçük numaralı ürünler (ör: 1, 2, 3...) mağazada ve anasayfada en önce listelenir.
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 16px; margin-top: 30px;">
+        <button type="submit" class="btn-drip-primary" style="padding: 16px 36px;">
+          FOTOĞRAFLARI VE TÜM BİLGİLERİ KAYDET →
+        </button>
+        <a href="/admin#tab-products" class="btn-drip-outline" style="padding: 16px 28px;">
+          Vazgeç
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function addEditColorRow() {
+    const container = document.getElementById('edit-extra-colors-container');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.style.cssText = 'display: grid; grid-template-columns: 1.5fr 1fr 1.5fr 40px; gap: 14px; margin-top: 12px; align-items: end; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-hairline);';
+    row.innerHTML = `
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Ek Renk Adı</label>
+        <input type="text" name="extra_color_name[]" class="form-control" placeholder="Örn: Beyaz, Vizon, Asker Yeşili" required>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Renk Kodu</label>
+        <input type="color" name="extra_color_hex[]" class="form-control" value="#FFFFFF" style="height: 48px; padding: 2px;">
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="font-size: 11px;">Bu Renge Özel Fotoğraf</label>
+        <input type="hidden" name="extra_color_existing_image[]" value="">
+        <input type="file" name="extra_color_photo[]" accept="image/*" class="form-control" style="padding: 9px; font-size: 11px;">
+      </div>
+      <button type="button" onclick="this.parentElement.remove()" style="height: 48px; background: rgba(239,68,68,0.15); border: 1px solid #EF4444; color: #FCA5A5; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;" title="Rengi Sil">
+        &times;
+      </button>
+    `;
+    container.appendChild(row);
+  }
+
+  function deleteProductImage(imageId) {
+    if (!confirm('Bu fotoğrafı galeriden silmek istediğinize emin misiniz?')) return;
+    fetch('/admin/products/delete-image/' + imageId, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const card = document.getElementById('img-card-' + imageId);
+          if (card) card.remove();
+        } else {
+          alert(data.message || 'Fotoğraf silinemedi.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Fotoğraf silinirken hata oluştu.');
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-delete-img').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-img-id');
+        if (id) deleteProductImage(parseInt(id, 10));
+      });
+    });
+
+    const isFeaturedEditToggle = document.getElementById('isFeaturedEditToggle');
+    const isFeaturedEditSlider = document.getElementById('isFeaturedEditSlider');
+    if (isFeaturedEditToggle && isFeaturedEditSlider) {
+      isFeaturedEditToggle.addEventListener('change', () => {
+        if (isFeaturedEditToggle.checked) {
+          isFeaturedEditSlider.classList.add('slider-featured');
+        } else {
+          isFeaturedEditSlider.classList.remove('slider-featured');
+        }
+      });
+    }
+
+    const has360EditToggle = document.getElementById('has360EditToggle');
+    const has360EditSlider = document.getElementById('has360EditSlider');
+    if (has360EditToggle && has360EditSlider) {
+      has360EditToggle.addEventListener('change', () => {
+        if (has360EditToggle.checked) {
+          has360EditSlider.classList.add('slider-360');
+        } else {
+          has360EditSlider.classList.remove('slider-360');
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .edit-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #242731;
+    transition: .3s;
+    border-radius: 26px;
+    border: 1px solid var(--border-hairline);
+  }
+  .edit-toggle-slider.slider-featured {
+    background-color: var(--electric-blue);
+    box-shadow: 0 0 12px rgba(36,83,255,0.6);
+  }
+  .edit-toggle-slider.slider-360 {
+    background-color: #10B981;
+    box-shadow: 0 0 12px rgba(16,185,129,0.6);
+  }
+</style>
+{% endblock %}

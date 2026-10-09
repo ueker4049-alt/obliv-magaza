@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+tiktok/
+tiktok_clips/
+temp_*
+frames_*
+*.mp4
+*.aac
+*.wav
+clip_*.jpg
+snapshot_*.jpg
+*.zip
+.vscode/
+.idea/

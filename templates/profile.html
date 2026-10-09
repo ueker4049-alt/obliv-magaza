@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Hesabım ve Siparişlerim | OBLIV{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 40px auto 140px; padding: 0 24px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border-hairline);">
+    <div>
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.16em;">MÜŞTERİ HESABI</span>
+      <h1 style="font-family: var(--font-display); font-size: 36px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase;">
+        SİPARİŞLERİM
+      </h1>
+      <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+        Hoş geldiniz, <strong>{{ current_user['name'] }}</strong> ({{ current_user['email'] }})
+      </p>
+    </div>
+    <a href="/logout" class="btn-drip-outline" style="font-size: 11px; padding: 10px 20px;">
+      Oturumu Kapat
+    </a>
+  </div>
+
+  {% if orders %}
+    <div style="background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 14px; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border-hairline); background: #14151B; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase;">
+            <th style="padding: 16px 20px;">Sipariş Kodu</th>
+            <th style="padding: 16px 20px;">Tarih</th>
+            <th style="padding: 16px 20px;">Teslimat Şehri</th>
+            <th style="padding: 16px 20px;">Tutar</th>
+            <th style="padding: 16px 20px;">Ödeme</th>
+            <th style="padding: 16px 20px;">Kargo Durumu</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ord in orders %}
+            <tr style="border-bottom: 1px solid var(--border-hairline);">
+              <td style="padding: 16px 20px; font-family: var(--font-mono); font-weight: 800; color: #FFFFFF;">
+                #{{ ord['order_number'] }}
+              </td>
+              <td style="padding: 16px 20px; color: var(--text-dim);">{{ ord['created_at'] }}</td>
+              <td style="padding: 16px 20px;">{{ ord['city'] }}</td>
+              <td style="padding: 16px 20px; font-family: var(--font-mono); font-weight: 800; color: var(--electric-blue);">
+                {{ "%.2f"|format(ord['total_amount']) }} ₺
+              </td>
+              <td style="padding: 16px 20px; color: #10B981; font-weight: 700;">✓ {{ ord['payment_status'] }}</td>
+              <td style="padding: 16px 20px;">
+                <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 800; background: #181E30; color: var(--electric-blue); border: 1px solid var(--border-blue);">
+                  {{ ord['order_status'] }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="background: #0E0F13; border: 1px solid var(--border-hairline); border-radius: 14px; padding: 60px 20px; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;">📦</div>
+      <h3 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">
+        HENÜZ SİPARİŞİNİZ BULUNMUYOR
+      </h3>
+      <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 24px;">En yeni OBLIV T-Shirt modellerini hemen keşfedebilirsiniz.</p>
+      <a href="/#catalog" class="btn-drip-primary">KOLEKSİYONA GÖZ AT →</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

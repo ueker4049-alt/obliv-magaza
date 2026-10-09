@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Tüm Ürünler | OBLIV{% endblock %}
+
+{% block content %}
+
+<section style="padding: 70px 0 35px; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(36,83,255,0.14) 0%, transparent 70%); border-bottom: 1px solid var(--border-hairline);">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(36,83,255,0.08); border: 1px solid var(--border-blue); border-radius: 999px; padding: 6px 18px; margin-bottom: 20px;">
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--electric-blue); display: inline-block; animation: pulse-dot 2s infinite;"></span>
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;">OBLIV KOLEKSİYONU</span>
+    </div>
+    <h1 style="font-family: var(--font-display); font-size: clamp(2.8rem, 5.5vw, 5rem); font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; color: #FFFFFF; line-height: 1.05; margin-bottom: 16px;">
+      TÜM ÜRÜNLER
+    </h1>
+    <p style="font-size: 15px; color: var(--text-dim); max-width: 580px; margin: 0 auto; line-height: 1.7;">
+      Renk, beden ve kategoriye göre filtreleyin; birinci sınıf kalıplarla tarzınızı hemen bulun.
+    </p>
+  </div>
+</section>
+
+<section style="padding: 40px 0 120px; background: var(--bg-deep);">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px;">
+
+    <!-- GELİŞMİŞ FİLTRELEME ÇUBUĞU (KATEGORİ, RENK, BEDEN, SIRALAMA) -->
+    <div style="background: #0E0F14; border: 1px solid var(--border-hairline); border-radius: 16px; padding: 22px 24px; margin-bottom: 36px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);">
+      
+      <!-- Üst Satır: Kategori Butonları & Sıralama -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border-hairline);">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;" id="category-filter-group">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-right: 6px;">KATEGORİ:</span>
+          <button type="button" class="btn-filter-category active" data-category="ALL">TÜMÜ</button>
+          {% if categories %}
+            {% for cat in categories %}
+              <button type="button" class="btn-filter-category" data-category="{{ cat['name']|escape }}">{{ cat['name']|upper }}</button>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <label style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">SIRALA:</label>
+          <select id="sort-select" style="background: #14151B; border: 1px solid var(--border-hairline); color: #FFF; font-family: var(--font-mono); font-size: 12px; padding: 8px 14px; border-radius: 8px; outline: none; cursor: pointer;">
+            <option value="default">Varsayılan Sıralama</option>
+            <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+            <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+            <option value="name-asc">İsim: A - Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Alt Satır: Renk ve Beden Filtreleri -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+        
+        <!-- Renk Filtresi -->
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">RENK:</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;" id="color-filter-group">
+            <button type="button" class="btn-filter-color active" data-color="ALL">TÜMÜ</button>
+            {% if filter_colors %}
+              {% for color_item in filter_colors %}
+                <button type="button" class="btn-filter-color" data-color="{{ color_item|escape }}">
+                  {{ color_item|upper }}
+                </button>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Beden Filtresi -->
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">BEDEN:</span>
+          <div style="display: flex; gap: 6px; align-items: center;" id="size-filter-group">
+            <button type="button" class="btn-filter-size active" data-size="ALL">TÜMÜ</button>
+            <button type="button" class="btn-filter-size" data-size="S">S</button>
+            <button type="button" class="btn-filter-size" data-size="M">M</button>
+            <button type="button" class="btn-filter-size" data-size="L">L</button>
+            <button type="button" class="btn-filter-size" data-size="XL">XL</button>
+          </div>
+        </div>
+
+        <!-- Temizle & Sayaç -->
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button type="button" id="btn-reset-filters" style="background: none; border: none; color: var(--electric-blue); font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-decoration: underline; cursor: pointer;">
+            Filtreleri Temizle ✕
+          </button>
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); background: #14151B; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-hairline);">
+            <strong id="visible-count" style="color: #FFFFFF;">{{ products|length }}</strong> ÜRÜN BULUNDU
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ÜRÜN LİSTESİ GRID -->
+    <div class="products-grid" id="products-grid">
+      {% if products %}
+        {% for product in products %}
+          <div 
+            class="drip-product-card product-grid-item" 
+            data-category="{{ product['category'] }}"
+            data-colors="{{ product['colors']|map(attribute='color_name')|join(',')|lower }}"
+            data-sizes="{{ product['available_sizes']|join(',') }}"
+            data-price="{{ product['price'] }}"
+            data-name="{{ product['name']|escape }}">
+            
+            <div class="drip-img-wrap">
+              <div class="drip-album-badge">{{ product['badge'] or 'OBLIV' }}</div>
+              {% if product['is_featured'] %}
+                <div class="drip-featured-badge">★ ÖNERİLEN</div>
+              {% endif %}
+              <a href="/product/{{ product['id'] }}">
+                <img src="{{ product['image_url'] }}" alt="{{ product['name'] }}" loading="eager" decoding="async">
+              </a>
+            </div>
+
+            <div class="drip-card-body">
+              <div class="drip-track-num" style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="drip-badge-cat">{{ product['category']|upper }}</span>
+                
+                <!-- Renk Noktaları Gösterimi -->
+                {% if product['colors'] and product['colors']|length > 0 %}
+                  <div style="display: flex; gap: 4px; align-items: center;" title="{{ product['colors']|length }} Farklı Renk">
+                    {% for c in product['colors'][:4] %}
+                      <span class="color-dot-preview" data-color="{{ c['color_hex'] }}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #2453FF; border: 1px solid rgba(255,255,255,0.4); display: inline-block;"></span>
+                    {% endfor %}
+                    {% if product['colors']|length > 4 %}
+                      <span style="font-size: 9px; font-family: var(--font-mono); color: var(--text-muted);">+{{ product['colors']|length - 4 }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <h3 class="drip-prod-name">
+                <a href="/product/{{ product['id'] }}">{{ product['name'] }}</a>
+              </h3>
+
+              <div class="drip-prod-meta" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>RAHAT KALIP</span>
+                <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);">
+                  {{ product['available_sizes']|join(' · ') }}
+                </span>
+              </div>
+
+              <div class="drip-price-row">
+                <span class="drip-price">{{ product['price']|int }} ₺</span>
+                {% if product['old_price'] %}
+                  <span class="drip-old-price">{{ product['old_price']|int }} ₺</span>
+                {% endif %}
+              </div>
+
+              <div class="drip-card-actions">
+                <a href="/product/{{ product['id'] }}" class="btn-view">DETAY</a>
+                {% if settings.get('wishlist_mode', '0') == '1' %}
+                  <button
+                    type="button"
+                    class="btn-add btn-wishlist-toggle-action"
+                    id="catalog-wishlist-btn-{{ product['id'] }}"
+                    data-id="{{ product['id'] }}"
+                    data-name="{{ product['name']|escape }}"
+                    style="background: #FFFFFF; color: #000000; border: 1px solid #FFFFFF; cursor: pointer; box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);">
+                    <span class="wishlist-icon">☆</span>
+                    <span class="wishlist-btn-label">İSTEK LİSTESİ</span>
+                  </button>
+                {% else %}
+                  <button
+                    type="button"
+                    class="btn-add btn-add-cart-action"
+                    id="catalog-add-btn-{{ product['id'] }}"
+                    data-id="{{ product['id'] }}"
+                    data-name="{{ product['name']|escape }}"
+                    data-price="{{ product['price'] }}"
+                    data-color="{{ product['color_name']|escape }}"
+                    data-size="M"
+                    data-image="{{ product['image_url'] }}"
+                    onclick="addToCart('{{ product['id'] }}', '{{ product['name']|escape }}', '{{ product['price'] }}', '{{ product['color_name']|escape }}', 'M', '{{ product['image_url'] }}')"
+                    style="cursor: pointer;">
+                    SEPETE EKLE
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Eşleşme Bulunamadı Durumu -->
+      <div id="no-filter-results" style="display: none; grid-column: 1 / -1; text-align: center; padding: 80px 20px; background: #0E0F14; border: 1px dashed var(--border-hairline); border-radius: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--electric-blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; opacity: 0.7;">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <h3 style="font-family: var(--font-display); font-size: 26px; font-weight: 900; text-transform: uppercase; color: #FFFFFF; margin-bottom: 8px;">
+          Kriterlere Uygun Ürün Bulunamadı
+        </h3>
+        <p style="color: var(--text-dim); font-size: 14px; max-width: 480px; margin: 0 auto 20px;">
+          Seçtiğiniz kategori, renk veya beden kombinasyonuna ait ürün bulunamadı. Filtreleri temizleyerek tüm koleksiyonu inceleyebilirsiniz.
+        </p>
+        <button type="button" onclick="resetAllFilters()" class="btn-drip-outline" style="padding: 10px 24px; font-size: 11px;">
+          Tüm Filtreleri Temizle
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .btn-filter-category, .btn-filter-color, .btn-filter-size {
+    background: #111319;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+  }
+
+  .btn-filter-category:hover, .btn-filter-color:hover, .btn-filter-size:hover {
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: #181B24;
+    transform: translateY(-1px);
+  }
+
+  .btn-filter-category.active, .btn-filter-color.active, .btn-filter-size.active {
+    background: var(--electric-blue) !important;
+    border-color: var(--electric-blue) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 16px rgba(36, 83, 255, 0.45) !important;
+    transform: translateY(-1px);
+  }
+</style>
+
+<script>
+  let activeCategory = 'ALL';
+  let activeColor = 'ALL';
+  let activeSize = 'ALL';
+  let currentSort = 'default';
+
+  function applyCombinedFilters() {
+    const items = Array.from(document.querySelectorAll('.product-grid-item'));
+    const noResults = document.getElementById('no-filter-results');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+      const itemCat = item.dataset.category || '';
+      const itemColors = (item.dataset.colors || '').split(',').map(s => s.trim().toLowerCase());
+      const itemSizes = (item.dataset.sizes || '').split(',').map(s => s.trim().toUpperCase());
+
+      const matchCat = (activeCategory === 'ALL' || itemCat.toUpperCase() === activeCategory.toUpperCase());
+      const matchColor = (activeColor === 'ALL' || itemColors.includes(activeColor.toLowerCase()));
+      const matchSize = (activeSize === 'ALL' || itemSizes.includes(activeSize.toUpperCase()));
+
+      if (matchCat && matchColor && matchSize) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    // Sıralama uygula
+    const grid = document.getElementById('products-grid');
+    if (grid && currentSort !== 'default') {
+      const visibleItems = items.filter(it => it.style.display !== 'none');
+      visibleItems.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price) || 0;
+        const priceB = parseFloat(b.dataset.price) || 0;
+        const nameA = (a.dataset.name || '').toLowerCase();
+        const nameB = (b.dataset.name || '').toLowerCase();
+
+        if (currentSort === 'price-asc') return priceA - priceB;
+        if (currentSort === 'price-desc') return priceB - priceA;
+        if (currentSort === 'name-asc') return nameA.localeCompare(nameB);
+        return 0;
+      });
+
+      visibleItems.forEach(it => grid.appendChild(it));
+    }
+
+    const countEl = document.getElementById('visible-count');
+    if (countEl) countEl.textContent = visibleCount;
+
+    if (noResults) {
+      noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+    }
+  }
+
+  function resetAllFilters() {
+    activeCategory = 'ALL';
+    activeColor = 'ALL';
+    activeSize = 'ALL';
+    currentSort = 'default';
+
+    document.querySelectorAll('.btn-filter-category').forEach(b => {
+      b.classList.toggle('active', b.dataset.category === 'ALL');
+    });
+    document.querySelectorAll('.btn-filter-color').forEach(b => {
+      b.classList.toggle('active', b.dataset.color === 'ALL');
+    });
+    document.querySelectorAll('.btn-filter-size').forEach(b => {
+      b.classList.toggle('active', b.dataset.size === 'ALL');
+    });
+
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) sortSelect.value = 'default';
+
+    applyCombinedFilters();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Kategori butonları
+    document.querySelectorAll('.btn-filter-category').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-filter-category').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeCategory = this.dataset.category || 'ALL';
+        applyCombinedFilters();
+      });
+    });
+
+    // Renk butonları
+    document.querySelectorAll('.btn-filter-color').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-filter-color').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeColor = this.dataset.color || 'ALL';
+        applyCombinedFilters();
+      });
+    });
+
+    // Beden butonları
+    document.querySelectorAll('.btn-filter-size').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-filter-size').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        activeSize = this.dataset.size || 'ALL';
+        applyCombinedFilters();
+      });
+    });
+
+    // Sıralama
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function() {
+        currentSort = this.value;
+        applyCombinedFilters();
+      });
+    }
+
+    // Sıfırla butonu
+    const resetBtn = document.getElementById('btn-reset-filters');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetAllFilters);
+    }
+
+    // Beden seçimi ve Sepete ekle delegate
+    document.addEventListener('click', function(e) {
+      const sizeBtn = e.target.closest('.card-size-btn');
+      if (sizeBtn) {
+        const container = sizeBtn.closest('.card-size-options');
+        if (container) {
+          container.querySelectorAll('.card-size-btn').forEach(b => b.classList.remove('active'));
+          sizeBtn.classList.add('active');
+          const prodId = container.dataset.prodId;
+          const addBtn = document.getElementById('catalog-add-btn-' + prodId);
+          if (addBtn) {
+            addBtn.dataset.size = sizeBtn.dataset.size || 'M';
+          }
+        }
+        return;
+      }
+
+      const cartBtn = e.target.closest('.btn-add-cart-action');
+      if (cartBtn) {
+        const id = parseInt(cartBtn.dataset.id, 10);
+        const name = cartBtn.dataset.name;
+        const price = parseFloat(cartBtn.dataset.price);
+        const color = cartBtn.dataset.color;
+        const size = cartBtn.dataset.size || 'M';
+        const image = cartBtn.dataset.image;
+        addToCart(id, name, price, color, size, image);
+      }
+    });
+
+    // URL parametresinden kategori seçimi (?category=Yeni+Gelenler)
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('category');
+    if (catParam) {
+      const matchBtn = Array.from(document.querySelectorAll('.btn-filter-category')).find(b => 
+        (b.dataset.category || '').toLowerCase() === catParam.toLowerCase()
+      );
+      if (matchBtn) {
+        document.querySelectorAll('.btn-filter-category').forEach(b => b.classList.remove('active'));
+        matchBtn.classList.add('active');
+        activeCategory = matchBtn.dataset.category;
+      }
+    }
+
+    // Renk önizleme noktalarını boya
+    document.querySelectorAll('.color-dot-preview').forEach(dot => {
+      if (dot.dataset.color) {
+        dot.style.backgroundColor = dot.dataset.color;
+      }
+    });
+
+    applyCombinedFilters();
+  });
+</script>
+{% endblock %}

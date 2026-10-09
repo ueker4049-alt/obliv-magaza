@@ -1,0 +1,19 @@
+{
+  "title": "Çok uygun fiyatlarlaaa 🤩 #fypage #keşfetedüş #tişört ",
+  "desc": "Çok uygun fiyatlarlaaa 🤩 #fypage #keşfetedüş #tişört ",
+  "track": "orijinal ses",
+  "artist": "waxietr",
+  "duration": 15,
+  "thumbnails": [
+    {
+      "id": "cover",
+      "url": "https://p19-common-sign.tiktokcdn.com/tos-alisg-i-photomode-sg/17a4524332f7447d87102c8cb35ed43c~tplv-photomode-image.jpeg?dr=14555&x-expires=1791633600&x-signature=0q6CAtjLhssxfWJNWuV6FKgExZc%3D&t=4d5b0474&ps=13740610&shp=81f88b70&shcp=9b759fb9&idc=my&ftpl=1",
+      "preference": -1
+    },
+    {
+      "id": "originCover",
+      "url": "https://p19-common-sign.tiktokcdn.com/tos-alisg-i-photomode-sg/17a4524332f7447d87102c8cb35ed43c~tplv-photomode-image.jpeg?dr=14555&x-expires=1791633600&x-signature=0q6CAtjLhssxfWJNWuV6FKgExZc%3D&t=4d5b0474&ps=13740610&shp=81f88b70&shcp=9b759fb9&idc=my&ftpl=1",
+      "preference": -1
+    }
+  ]
+}

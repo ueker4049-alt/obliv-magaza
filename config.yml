@@ -1,0 +1,10 @@
+tunnel: 4ec10ec5-400c-46a5-86f2-e59667f7a144
+credentials-file: C:\Users\Umut\.cloudflared\4ec10ec5-400c-46a5-86f2-e59667f7a144.json
+
+ingress:
+  - hostname: oblivwear.com.tr
+    service: http://localhost:5000
+  - hostname: www.oblivwear.com.tr
+    service: http://localhost:5000
+  - service: http_status:404
+
