@@ -2314,11 +2314,11 @@ def api_live_chat():
             "suggestions": ["🧵 Kumaş Kalitesi", "📏 Beden Danışmanı", "👕 Ürünler"]
         })
 
-    # 8. RETURN & EXCHANGE
+    # 8. NO RETURN / NO EXCHANGE
     if any(w in user_msg for w in ['iade', 'değişim', 'degisim', 'iptal', 'geri gönderme']):
         return jsonify({
-            "reply": "⚠️ **İade ve Değişim Politikası:**\nOBLIV koleksiyonları sınırlı sayıda butik drop olarak üretilmektedir. Bu nedenle standart keyfi iade ve beden değişimi yapılamamaktadır.\n\nSipariş vermeden önce canlı destekten **beden danışmanımıza** danışmanızı öneririz. Kargo hasarı veya nadir kusurlu ürün durumunda ise derhal birebir telafi ve yeni ürün gönderimi sağlanmaktadır.",
-            "suggestions": ["📏 Bedenimi Bul", "💬 WhatsApp Yetkilisi", "💳 Ödeme"]
+            "reply": "Mağazamızda özel butik ve sınırlı üretim (limited drop) serileri olması sebebiyle iade ve değişim yapılmamaktadır. Siparişinizi oluşturmadan önce beden danışmanımıza boy ve kilonuzu yazarak size en uygun bedeni öğrenebilirsiniz.",
+            "suggestions": ["📏 Bedenimi Bul", "👕 T-Shirt Modelleri", "💬 WhatsApp Destek"]
         })
 
     # 9. COUPON & PROMOTIONS
