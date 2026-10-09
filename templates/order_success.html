@@ -38,13 +38,13 @@
         </span>
       </div>
       {% if 'Havale' in order['payment_status'] or order['card_last4'] == 'HAVALE/FAST' %}
-      <div style="background: rgba(36, 83, 255, 0.08); border: 1px solid var(--border-blue); border-radius: 10px; padding: 14px; margin: 6px 0;">
+      <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-blue); border-radius: 10px; padding: 14px; margin: 6px 0;">
         <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 800; margin-bottom: 6px;">
           📌 ÖDEME GÖNDERİLECEK IBAN BİLGİSİ:
         </div>
         <div style="font-size: 13px; color: #FFF; margin-bottom: 2px;"><strong>Alıcı:</strong> {{ settings.get('bank_account_holder', 'Mustafa Umut Eker') }}</div>
         <div style="font-size: 13px; color: #FFF; margin-bottom: 6px;"><strong>Banka:</strong> {{ settings.get('bank_name', 'Ziraat Bankası') }}</div>
-        <div style="font-family: var(--font-mono); font-size: 13px; color: #60A5FA; font-weight: 700; word-break: break-all;">
+        <div style="font-family: var(--font-mono); font-size: 13px; color: #FFFFFF; font-weight: 700; word-break: break-all;">
           {{ settings.get('bank_iban', 'TR59 0001 0090 1118 4713 7050 01') }}
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">

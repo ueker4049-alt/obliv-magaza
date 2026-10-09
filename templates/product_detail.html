@@ -54,7 +54,7 @@
   }
   .product-top-bar-link:hover {
     border-color: var(--electric-blue);
-    background: rgba(36, 83, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
     color: #FFFFFF;
     transform: translateY(-1px);
   }
@@ -119,7 +119,7 @@
     pointer-events: none;
     -webkit-user-drag: none;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
-    filter: drop-shadow(0 0 20px rgba(36, 83, 255, 0.35));
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.35));
   }
 
   /* Slide Counter Badge */
@@ -164,11 +164,11 @@
     opacity: 0.9;
   }
   .slider-nav-arrow:hover {
-    background: rgba(36, 83, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border-color: var(--electric-blue);
     opacity: 1;
     transform: translateY(-50%) scale(1.08);
-    box-shadow: 0 0 16px rgba(36, 83, 255, 0.7);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.5);
   }
   .slider-nav-arrow:active {
     transform: translateY(-50%) scale(0.95);
@@ -210,7 +210,7 @@
   .slider-dot.active {
     width: 24px;
     background: var(--electric-blue);
-    box-shadow: 0 0 12px rgba(36, 83, 255, 0.9);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.95);
   }
 
   /* Lightbox Button */
@@ -234,7 +234,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   }
   .slider-lightbox-btn:hover {
-    background: rgba(36, 83, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border-color: var(--electric-blue);
     transform: scale(1.08);
   }
@@ -764,7 +764,7 @@
 
     <!-- Yorum Yapma Koşulları & Form Alanı -->
     {% if not current_user %}
-      <div style="background: rgba(36, 83, 255, 0.04); border: 1px solid rgba(36, 83, 255, 0.15); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 40px;">
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 40px;">
         <div style="font-size: 20px; margin-bottom: 8px;">🔒</div>
         <div style="font-weight: 700; font-size: 15px; color: #FFFFFF; margin-bottom: 6px;">Yorum Yapmak İçin Giriş Yapın</div>
         <p style="color: var(--text-dim); font-size: 13px; max-width: 480px; margin: 0 auto 16px;">
@@ -792,7 +792,7 @@
       </div>
     {% else %}
       <!-- Satın Almış Üye İçin Yorum ve Fotoğraf Yükleme Formu -->
-      <div style="background: #0E0F14; border: 1px solid rgba(36,83,255,0.3); border-radius: 18px; padding: 28px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div style="background: #0E0F14; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 18px; padding: 28px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #FFFFFF;">
@@ -967,7 +967,7 @@
       thumb.classList.toggle('active', isActive);
       if (isActive) {
         thumb.style.borderColor = 'var(--electric-blue)';
-        thumb.style.boxShadow = '0 0 12px rgba(36, 83, 255, 0.5)';
+        thumb.style.boxShadow = '0 0 12px rgba(255, 255, 255, 0.45)';
         thumb.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
       } else {
         thumb.style.borderColor = 'var(--border-hairline)';
@@ -1030,7 +1030,7 @@
     if (btn) {
       btn.classList.add('active');
       btn.style.borderColor = 'var(--electric-blue)';
-      btn.style.boxShadow = '0 0 10px rgba(36,83,255,0.7)';
+      btn.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.6)';
     }
 
     if (colorImage) {

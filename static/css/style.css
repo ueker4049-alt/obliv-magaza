@@ -25,16 +25,16 @@ img {
   --bg-card-hover: #16181E;
   --bg-pill: rgba(13, 13, 14, 0.94);
   --bg-pill-hover: rgba(28, 29, 34, 0.94);
-  --electric-blue: #2453FF;
-  --electric-blue-glow: rgba(36, 83, 255, 0.4);
-  --electric-blue-hover: #1B44DC;
+  --electric-blue: #FFFFFF;
+  --electric-blue-glow: rgba(255, 255, 255, 0.35);
+  --electric-blue-hover: #E5E7EB;
   --accent-gold: #D2B774;
   --text-white: #F4F3F0;
   --text-dim: #9296A1;
   --text-muted: #5A5E6B;
   --border-hairline: rgba(255, 255, 255, 0.08);
   --border-subtle: rgba(255, 255, 255, 0.12);
-  --border-blue: rgba(36, 83, 255, 0.4);
+  --border-blue: rgba(255, 255, 255, 0.25);
   --font-display: 'Big Shoulders Display', Impact, 'Arial Narrow', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
@@ -67,8 +67,8 @@ a {
 }
 
 .drip-marquee {
-  background-color: var(--electric-blue);
-  color: #F4F3F0;
+  background-color: #FFFFFF;
+  color: #000000;
   overflow: hidden;
   white-space: nowrap;
   padding: 8px 0;
@@ -117,7 +117,7 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
     0 20px 45px -10px rgba(0, 0, 0, 0.85),
-    0 0 35px rgba(36, 83, 255, 0.25),
+    0 0 35px rgba(255, 255, 255, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
   border-radius: 999px;
   padding: 4px 6px;
@@ -130,9 +130,9 @@ a {
 .floating-dock:hover {
   box-shadow: 
     0 24px 50px -10px rgba(0, 0, 0, 0.9),
-    0 0 50px rgba(36, 83, 255, 0.45),
+    0 0 50px rgba(255, 255, 255, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  border-color: rgba(96, 165, 250, 0.45);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
 .dock-logo {
@@ -201,8 +201,8 @@ a {
   gap: 8px;
   height: 42px;
   padding: 0 20px;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  color: #000000;
   border-radius: 999px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -211,21 +211,21 @@ a {
   text-transform: uppercase;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
 
 .dock-cart-btn:hover {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: #E5E7EB;
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 22px rgba(255, 255, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
 .dock-cart-btn:active {
   transform: translateY(1px) scale(0.97);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
 }
 
 .dock-badge {
@@ -573,9 +573,9 @@ a {
   position: relative;
   padding: 90px 0 70px;
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(36, 83, 255, 0.28), transparent),
-    radial-gradient(circle at 15% 40%, rgba(36, 83, 255, 0.08), transparent 45%),
-    radial-gradient(circle at 85% 40%, rgba(96, 165, 250, 0.08), transparent 45%),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.28), transparent),
+    radial-gradient(circle at 15% 40%, rgba(255, 255, 255, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 40%, rgba(255, 255, 255, 0.08), transparent 45%),
     #08090C;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -606,7 +606,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(36, 83, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid var(--electric-blue);
   color: #93C5FD;
   font-family: var(--font-mono);
@@ -654,8 +654,8 @@ a {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  color: #000000;
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 800;
@@ -666,7 +666,7 @@ a {
   transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 28px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   position: relative;
   overflow: hidden;
   text-decoration: none;
@@ -690,16 +690,16 @@ a {
 }
 
 .btn-drip-primary:hover {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: #E5E7EB;
   border-color: rgba(255, 255, 255, 0.5);
-  color: #FFFFFF;
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn-drip-primary:active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.4);
 }
 
 .btn-drip-outline {
@@ -821,7 +821,7 @@ a {
   color: #FFFFFF !important;
   border-color: var(--electric-blue) !important;
   font-weight: 800 !important;
-  box-shadow: 0 4px 18px rgba(36, 83, 255, 0.45) !important;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.45) !important;
   transform: translateY(-2px);
 }
 
@@ -846,13 +846,13 @@ a {
 
 .drip-product-card:hover {
   background: linear-gradient(180deg, rgba(22, 28, 44, 0.92) 0%, rgba(10, 13, 20, 0.99) 100%);
-  border-color: rgba(96, 165, 250, 0.5);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-6px) translateZ(0);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(36, 83, 255, 0.25);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(255, 255, 255, 0.25);
 }
 
 .drip-img-wrap {
-  background: radial-gradient(circle at 50% 50%, rgba(36, 83, 255, 0.2) 0%, rgba(18, 22, 34, 0.95) 55%, #0B0D13 100%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(18, 22, 34, 0.95) 55%, #0B0D13 100%);
   padding: 34px 24px;
   display: flex;
   align-items: center;
@@ -869,7 +869,7 @@ a {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(36, 83, 255, 0.35) 0%, rgba(59, 130, 246, 0.12) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
   pointer-events: none;
   transform: translateZ(0);
 }
@@ -892,13 +892,13 @@ a {
   z-index: 1;
   will-change: transform;
   transform: translateZ(0);
-  filter: drop-shadow(0 0 12px rgba(36, 83, 255, 0.5));
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
   transition: transform 0.25s ease;
 }
 
 .drip-product-card:hover .drip-img-wrap img {
   transform: translateY(-4px) scale(1.04) translateZ(0);
-  filter: drop-shadow(0 0 18px rgba(36, 83, 255, 0.8));
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.8));
 }
 
 .drip-album-badge {
@@ -933,7 +933,7 @@ a {
   padding: 5px 11px;
   border-radius: 999px;
   text-transform: uppercase;
-  box-shadow: 0 4px 14px rgba(36, 83, 255, 0.45);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.45);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -956,7 +956,7 @@ a {
 }
 
 .drip-badge-cat {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(255, 255, 255, 0.18);
   border: 1px solid var(--electric-blue);
   color: #8BA0FF;
   font-size: 11px;
@@ -1037,8 +1037,8 @@ a {
 
 .drip-card-actions .btn-add {
   flex: 1;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  color: #000000;
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1049,7 +1049,7 @@ a {
   cursor: pointer;
   text-transform: uppercase;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1058,15 +1058,15 @@ a {
 }
 
 .drip-card-actions .btn-add:hover {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: #E5E7EB;
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .drip-card-actions .btn-add:active {
   transform: translateY(1px) scale(0.97);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
 }
 
 .drip-card-actions .btn-view {
@@ -1111,7 +1111,7 @@ a {
 }
 
 .detail-img-box {
-  background: radial-gradient(circle at 50% 50%, rgba(36, 83, 255, 0.16) 0%, #12151F 55%, #0A0C12 100%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.16) 0%, #12151F 55%, #0A0C12 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 28px;
   padding: 40px;
@@ -1122,7 +1122,7 @@ a {
   top: 40px;
   box-shadow: 
     0 30px 60px -15px rgba(0, 0, 0, 0.9),
-    0 0 50px rgba(36, 83, 255, 0.22);
+    0 0 50px rgba(255, 255, 255, 0.22);
   position: relative;
   overflow: hidden;
 }
@@ -1133,7 +1133,7 @@ a {
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(36, 83, 255, 0.4) 0%, rgba(59, 130, 246, 0.15) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.15) 50%, transparent 75%);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -1145,16 +1145,16 @@ a {
   z-index: 1;
   filter: 
     drop-shadow(0 15px 30px rgba(0, 0, 0, 0.85)) 
-    drop-shadow(0 0 25px rgba(36, 83, 255, 0.5))
-    drop-shadow(0 0 60px rgba(36, 83, 255, 0.25));
+    drop-shadow(0 0 25px rgba(255, 255, 255, 0.5))
+    drop-shadow(0 0 60px rgba(255, 255, 255, 0.25));
   transition: transform 0.4s ease, filter 0.4s ease;
 }
 
 .detail-img-box:hover img {
   filter: 
     drop-shadow(0 20px 40px rgba(0, 0, 0, 0.95)) 
-    drop-shadow(0 0 40px rgba(36, 83, 255, 0.8))
-    drop-shadow(0 0 90px rgba(96, 165, 250, 0.45));
+    drop-shadow(0 0 40px rgba(255, 255, 255, 0.8))
+    drop-shadow(0 0 90px rgba(255, 255, 255, 0.45));
 }
 
 .detail-info-box {
@@ -1206,7 +1206,7 @@ a {
   background: var(--electric-blue);
   border-color: var(--electric-blue);
   color: #FFFFFF;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.45);
   transform: translateY(-1px);
 }
 
@@ -1262,7 +1262,7 @@ a {
 
 .gallery-thumb-btn.active {
   border-color: var(--electric-blue);
-  box-shadow: 0 0 12px rgba(36, 83, 255, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
 }
 
 .product-color-swatch-btn {
@@ -1278,7 +1278,7 @@ a {
 
 .product-color-swatch-btn.active {
   border-color: var(--electric-blue);
-  box-shadow: 0 0 10px rgba(36, 83, 255, 0.7);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
 .review-photo-protected {
@@ -1436,14 +1436,14 @@ a {
   padding: 10px 20px 10px 14px;
   color: #FFFFFF;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0, 82, 255, 0.35), 0 4px 14px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.35), 0 4px 14px rgba(0, 0, 0, 0.8);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .live-chat-pill:hover {
   transform: translateY(-4px) scale(1.02);
   background: #141722;
-  box-shadow: 0 14px 38px rgba(0, 82, 255, 0.5);
+  box-shadow: 0 14px 38px rgba(255, 255, 255, 0.5);
 }
 
 .live-chat-pill-avatar-wrap {
@@ -1512,7 +1512,7 @@ a {
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 82, 255, 0.2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 255, 255, 0.2);
   overflow: hidden;
   animation: slideUpFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1541,7 +1541,7 @@ a {
 .live-chat-avatar {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, var(--electric-blue), #0036A8);
+  background: #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1632,7 +1632,7 @@ a {
 }
 
 .live-chat-chips::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.4);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 4px;
 }
 
@@ -1689,8 +1689,7 @@ a {
 
 .chat-bubble-user {
   align-self: flex-end;
-  background: var(--electric-blue);
-  color: #FFFFFF;
+  background: #FFFFFF; color: #000000; font-weight: 600;
   border-bottom-right-radius: 4px;
 }
 
@@ -1704,7 +1703,7 @@ a {
 }
 
 .chat-bubble-user .bubble-sender {
-  color: rgba(255, 255, 255, 0.8);
+  color: #000000;
 }
 
 .bubble-time {
@@ -1747,8 +1746,7 @@ a {
 .live-chat-input-bar button {
   width: 40px;
   height: 40px;
-  background: var(--electric-blue);
-  color: #FFFFFF;
+  background: #FFFFFF; color: #000000;
   border: none;
   border-radius: 8px;
   display: flex;
@@ -1785,8 +1783,8 @@ a {
 }
 
 .ticket-status-customer {
-  background: rgba(37, 99, 235, 0.15);
-  color: #60A5FA;
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
   border: 1px solid var(--electric-blue);
 }
 
@@ -1930,7 +1928,7 @@ a {
     right: 14px;
     padding: 8px 14px 8px 10px;
     gap: 8px;
-    box-shadow: 0 8px 24px rgba(0, 82, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
   }
 
   .live-chat-pill-avatar-wrap {
@@ -2217,13 +2215,13 @@ a {
 
 .quality-card-luxury:hover {
   transform: translateY(-3px);
-  border-color: rgba(36, 83, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Brand Marquee */
 .drip-marquee {
-  background-color: var(--electric-blue);
-  color: #F4F3F0;
+  background-color: #FFFFFF;
+  color: #000000;
 }
 
 /* ==========================================================================
@@ -2268,7 +2266,7 @@ a {
 }
 
 .announcement-item strong {
-  color: #60A5FA;
+  color: #FFFFFF;
   font-weight: 800;
 }
 
@@ -2311,8 +2309,8 @@ a {
 }
 
 .trust-perk-card:hover {
-  background: rgba(36, 83, 255, 0.05);
-  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.35);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
@@ -2322,8 +2320,8 @@ a {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(36, 83, 255, 0.12);
-  border: 1px solid rgba(36, 83, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2394,7 +2392,7 @@ a {
   left: 14px;
   z-index: 3;
   background: rgba(10, 14, 24, 0.85);
-  border: 1px solid rgba(96, 165, 250, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #93C5FD;
   font-family: var(--font-mono);
   font-size: 9px;
@@ -2480,7 +2478,7 @@ a {
   background: var(--electric-blue);
   color: #FFFFFF;
   border-color: var(--electric-blue);
-  box-shadow: 0 2px 8px rgba(36, 83, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
 }
 
 /* 5. CART SHIPPING PROGRESS BAR (DRAWER) */
@@ -2517,7 +2515,7 @@ a {
   height: 100%;
   border-radius: 999px;
   transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
-  box-shadow: 0 0 10px rgba(36, 83, 255, 0.6);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
 }
 
 /* 6. SOCIAL PROOF LIVE TOAST POPUP */
@@ -2536,7 +2534,7 @@ a {
   border-left: 3px solid var(--electric-blue);
   border-radius: 12px;
   padding: 12px 18px 12px 14px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(36, 83, 255, 0.15);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(255, 255, 255, 0.15);
   max-width: 380px;
   transform: translateY(120px) scale(0.92);
   opacity: 0;
@@ -2555,8 +2553,8 @@ a {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(36, 83, 255, 0.16);
-  border: 1px solid rgba(36, 83, 255, 0.4);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;

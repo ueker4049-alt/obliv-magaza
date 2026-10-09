@@ -47,7 +47,7 @@ def init_db():
         'contact_phone': "+90 850 300 3853",
         'smtp_email': "oblivwear@gmail.com",
         'smtp_app_password': "",
-        'theme_color': "#2453FF",
+        'theme_color': "#FFFFFF",
         'font_heading': "'Big Shoulders Display', Impact, sans-serif",
         'font_body': "'Plus Jakarta Sans', sans-serif",
         'iyzico_api_key': "",

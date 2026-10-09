@@ -30,7 +30,7 @@
   }
   .admin-nav-link.active {
     color: #FFFFFF !important;
-    background: rgba(36, 83, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.18) !important;
     border: 1px solid var(--electric-blue);
     font-weight: 700;
   }
@@ -67,7 +67,7 @@
     vertical-align: middle;
   }
   .admin-table tr:hover td {
-    background: rgba(34, 76, 175, 0.04);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   @media (max-width: 900px) {
@@ -155,7 +155,7 @@
       <a href="javascript:void(0)" class="admin-nav-link" data-tab="orders" onclick="switchAdminTab('orders')">
         📦 Siparişler ({{ orders|length }})
       </a>
-      <a href="javascript:void(0)" class="admin-nav-link" data-tab="support" onclick="switchAdminTab('support')" style="color: #60A5FA; font-weight: 700;">
+      <a href="javascript:void(0)" class="admin-nav-link" data-tab="support" onclick="switchAdminTab('support')" style="color: #FFFFFF; font-weight: 700;">
         💬 Destek Talepleri ({{ support_tickets|length }})
       </a>
       <a href="javascript:void(0)" class="admin-nav-link" data-tab="reviews" onclick="switchAdminTab('reviews')" style="color: #F59E0B; font-weight: 700;">
@@ -202,7 +202,7 @@
         </div>
 
         <!-- Ziyaretçi İstatistikleri (Tekil & Sayfa Görüntüleme) -->
-        <div style="background: linear-gradient(135deg, rgba(36,83,255,0.12) 0%, #0F1014 100%); border: 1px solid var(--electric-blue); border-radius: 14px; padding: 24px; position: relative; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, rgba(255, 255, 255,0.12) 0%, #0F1014 100%); border: 1px solid var(--electric-blue); border-radius: 14px; padding: 24px; position: relative; overflow: hidden;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); text-transform: uppercase; font-weight: 800; letter-spacing: 0.1em;">
               👁️ TOPLAM TEKİL ZİYARETÇİ
@@ -213,7 +213,7 @@
             {{ visitor_stats.total_unique }}
           </div>
           <div style="display: flex; gap: 14px; font-size: 11px; color: var(--text-dim); font-family: var(--font-mono);">
-            <span>Bugün: <strong style="color: #60A5FA;">{{ visitor_stats.today_unique }} kişi</strong></span>
+            <span>Bugün: <strong style="color: #FFFFFF;">{{ visitor_stats.today_unique }} kişi</strong></span>
             <span>•</span>
             <span>Hit: <strong style="color: #F3F4F6;">{{ visitor_stats.total_views }} sayfa</strong></span>
           </div>
@@ -341,7 +341,7 @@
             </div>
 
             <!-- 360 Dönüş İçin Tişörtün Arka Yüzü Fotoğrafı -->
-            <div style="background: rgba(36, 83, 255, 0.06); border: 1px solid rgba(36, 83, 255, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
               <label class="form-label" style="color: #FFFFFF; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
                 <span>🔄</span> Tişörtün Arka Yüzü Fotoğrafı (360° Çevirme İçin)
               </label>
@@ -423,7 +423,7 @@
               <label class="form-label" style="color: var(--electric-blue); font-weight: 800; margin-bottom: 0;">
                 🎨 RENK SEÇENEKLERİ & VARYASYONLAR
               </label>
-              <button type="button" onclick="addAdminAddColorRow()" style="background: rgba(36,83,255,0.15); border: 1px solid var(--electric-blue); color: #FFF; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; cursor: pointer;">
+              <button type="button" onclick="addAdminAddColorRow()" style="background: rgba(255, 255, 255,0.15); border: 1px solid var(--electric-blue); color: #FFF; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; cursor: pointer;">
                 + Ek Renk Ekle
               </button>
             </div>
@@ -453,7 +453,7 @@
             <textarea name="description" class="form-control" rows="3" placeholder="Modelin detayları, kumaş özellikleri ve albüm teması..."></textarea>
           </div>
 
-          <div style="background: rgba(36, 83, 255, 0.08); border: 1px solid rgba(36, 83, 255, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
             <div>
               <div style="font-weight: 700; font-size: 14px; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
                 <span>⭐</span> Ürünü Öne Çıkar (Anasayfada Göster)
@@ -528,10 +528,10 @@
                       min="0"
                       class="product-order-input"
                       data-product-id="{{ prod['id'] }}"
-                      style="width: 54px; background: #0A0C10; border: 1px solid var(--border-subtle); color: #60A5FA; font-family: var(--font-mono); font-weight: 800; font-size: 13px; text-align: center; padding: 6px 4px; border-radius: 8px; outline: none; transition: all 0.2s;"
+                      style="width: 54px; background: #0A0C10; border: 1px solid var(--border-subtle); color: #FFFFFF; font-family: var(--font-mono); font-weight: 800; font-size: 13px; text-align: center; padding: 6px 4px; border-radius: 8px; outline: none; transition: all 0.2s;"
                       title="Değiştirip Enter'a basın veya dışına tıklayın"
                       onchange="updateProductDisplayOrder(this)"
-                      onfocus="this.style.borderColor='var(--electric-blue)'; this.style.boxShadow='0 0 10px rgba(36,83,255,0.4)';"
+                      onfocus="this.style.borderColor='var(--electric-blue)'; this.style.boxShadow='0 0 10px rgba(255, 255, 255,0.4)';"
                       onblur="this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='none';">
                   </div>
                 </td>
@@ -575,7 +575,7 @@
                       class="featured-toggle-btn"
                       data-product-id="{{ prod['id'] }}"
                       data-featured="1"
-                      style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.25s; border: 1px solid var(--electric-blue); background: rgba(36,83,255,0.2); color: #7EB3FF;"
+                      style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-family: var(--font-mono); font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.25s; border: 1px solid var(--electric-blue); background: rgba(255, 255, 255,0.2); color: #7EB3FF;"
                       title="Anasayfada Göster / Gizle">
                       <span style="font-size: 13px;">★</span>
                       <span class="featured-btn-label">ÖNE ÇIKARILDI</span>
@@ -847,16 +847,16 @@
                   Seçtiğiniz renk tüm sitedeki butonlar, neon vurgular ve <strong>OBLIV logosunun mavi 'V' simgesi ile animasyonlu logosuna</strong> anında uygulanır.
                 </p>
               </div>
-              <span id="current-theme-badge" data-theme="{{ site_settings.get('theme_color', '#2453FF') }}" style="color: #FFFFFF; font-family: var(--font-mono); font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 999px; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">
-                {{ site_settings.get('theme_color', '#2453FF') }}
+              <span id="current-theme-badge" data-theme="{{ site_settings.get('theme_color', '#FFFFFF') }}" style="color: #FFFFFF; font-family: var(--font-mono); font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 999px; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">
+                {{ site_settings.get('theme_color', '#FFFFFF') }}
               </span>
             </div>
 
             <!-- Curated Luxury Presets -->
             <label class="form-label" style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">ÖZEL SEÇİLMİŞ MARKA RENK PALETLERİ (TIKLAYINCA SEÇİLİR):</label>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px;">
-              <button type="button" class="theme-preset-btn" data-color="#2453FF" onclick="selectThemePreset('#2453FF', 'OBLIV Kobalt Mavi (Orijinal)')" style="background: #0E1017; border: 1px solid rgba(36,83,255,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
-                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #2453FF; vertical-align: middle; margin-right: 6px;"></span>
+              <button type="button" class="theme-preset-btn" data-color="#FFFFFF" onclick="selectThemePreset('#FFFFFF', 'OBLIV Kobalt Mavi (Orijinal)')" style="background: #0E1017; border: 1px solid rgba(255, 255, 255,0.4); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer;">
+                <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #FFFFFF; vertical-align: middle; margin-right: 6px;"></span>
                 <span style="font-family: var(--font-mono); font-size: 11px; color: #FFF; font-weight: 700;">Kobalt Mavi</span>
               </button>
 
@@ -894,10 +894,10 @@
             <!-- Custom Hex Input & Live Color Picker -->
             <div style="display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: center;">
               <div>
-                <input type="color" id="theme-color-native" value="{{ site_settings.get('theme_color', '#2453FF') }}" style="width: 100%; height: 48px; border: 1px solid var(--border-hairline); border-radius: 8px; background: transparent; cursor: pointer; padding: 2px;" onchange="updateThemeColorInput(this.value)">
+                <input type="color" id="theme-color-native" value="{{ site_settings.get('theme_color', '#FFFFFF') }}" style="width: 100%; height: 48px; border: 1px solid var(--border-hairline); border-radius: 8px; background: transparent; cursor: pointer; padding: 2px;" onchange="updateThemeColorInput(this.value)">
               </div>
               <div>
-                <input type="text" id="theme-color-input" name="theme_color" class="form-control" value="{{ site_settings.get('theme_color', '#2453FF') }}" placeholder="#2453FF" required oninput="updateThemeColorNative(this.value)">
+                <input type="text" id="theme-color-input" name="theme_color" class="form-control" value="{{ site_settings.get('theme_color', '#FFFFFF') }}" placeholder="#FFFFFF" required oninput="updateThemeColorNative(this.value)">
                 <span style="font-size: 11px; color: var(--text-dim); display: block; margin-top: 4px;">* Renk seçiciye tıklayabilir veya dilediğiniz HEX kodunu elle girebilirsiniz.</span>
               </div>
             </div>
@@ -1179,7 +1179,7 @@
     
     <div id="section-support" style="margin-bottom: 50px; display: none;">
       <div style="margin-bottom: 24px;">
-        <span style="font-family: var(--font-mono); font-size: 11px; color: #60A5FA; font-weight: 700; letter-spacing: 0.16em;">MÜŞTERİ HİZMETLERİ</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: #FFFFFF; font-weight: 700; letter-spacing: 0.16em;">MÜŞTERİ HİZMETLERİ</span>
         <h2 style="font-family: var(--font-display); font-size: 32px; font-weight: 900; text-transform: uppercase;">
           DESTEK TALEPLERİ
         </h2>
@@ -1202,7 +1202,7 @@
           <tbody>
             {% for ticket in support_tickets %}
               <tr style="border-bottom: 1px solid var(--border-hairline);">
-                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 800; color: #60A5FA;">
+                <td style="padding: 14px 20px; font-family: var(--font-mono); font-weight: 800; color: #FFFFFF;">
                   #{{ ticket['ticket_number'] }}
                 </td>
                 <td style="padding: 14px 20px;">
@@ -1217,7 +1217,7 @@
                   {% if ticket['status'] == 'Açık' %}
                     <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #1C2915; color: #86EFAC; border: 1px solid #2D5A1E;">● Açık</span>
                   {% elif ticket['status'] == 'Yanıtlandı' %}
-                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #181E30; color: #60A5FA; border: 1px solid #2A3A6B;">● Yanıtlandı</span>
+                    <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #181E30; color: #FFFFFF; border: 1px solid #2A3A6B;">● Yanıtlandı</span>
                   {% elif ticket['status'] == 'Kapatıldı' %}
                     <span style="font-family: var(--font-mono); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: #1A1A1A; color: #888888; border: 1px solid #333;">● Kapatıldı</span>
                   {% else %}
@@ -1476,7 +1476,7 @@
               label.textContent = isFeatured ? 'ÖNE ÇIKARILDI' : 'ÖNE ÇIKAR';
               if (isFeatured) {
                 this.style.borderColor = 'var(--electric-blue)';
-                this.style.background = 'rgba(36,83,255,0.2)';
+                this.style.background = 'rgba(255, 255, 255,0.2)';
                 this.style.color = '#7EB3FF';
               } else {
                 this.style.borderColor = 'var(--border-hairline)';
@@ -1494,7 +1494,7 @@
       const productId = inputEl.dataset.productId;
       const newOrder = inputEl.value;
       const originalBg = inputEl.style.background;
-      inputEl.style.background = 'rgba(36, 83, 255, 0.25)';
+      inputEl.style.background = 'rgba(255, 255, 255, 0.25)';
 
       const fd = new FormData();
       fd.append('product_id', productId);
@@ -1526,7 +1526,7 @@
       const updateSlider = () => {
         if (isFeaturedAddToggle.checked) {
           isFeaturedAddSlider.style.backgroundColor = 'var(--electric-blue)';
-          isFeaturedAddSlider.style.boxShadow = '0 0 12px rgba(36,83,255,0.6)';
+          isFeaturedAddSlider.style.boxShadow = '0 0 12px rgba(255, 255, 255,0.6)';
         } else {
           isFeaturedAddSlider.style.backgroundColor = '#242731';
           isFeaturedAddSlider.style.boxShadow = 'none';

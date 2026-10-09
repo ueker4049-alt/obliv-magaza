@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<section style="padding: 70px 0 35px; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(36,83,255,0.14) 0%, transparent 70%); border-bottom: 1px solid var(--border-hairline);">
+<section style="padding: 70px 0 35px; background: radial-gradient(ellipse 120% 60% at 50% -10%, rgba(255, 255, 255,0.14) 0%, transparent 70%); border-bottom: 1px solid var(--border-hairline);">
   <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center;">
-    <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(36,83,255,0.08); border: 1px solid var(--border-blue); border-radius: 999px; padding: 6px 18px; margin-bottom: 20px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255, 255, 255,0.08); border: 1px solid var(--border-blue); border-radius: 999px; padding: 6px 18px; margin-bottom: 20px;">
       <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--electric-blue); display: inline-block; animation: pulse-dot 2s infinite;"></span>
       <span style="font-family: var(--font-mono); font-size: 11px; color: var(--electric-blue); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;">OBLIV KOLEKSİYONU</span>
     </div>
@@ -122,7 +122,7 @@
                 {% if product['colors'] and product['colors']|length > 0 %}
                   <div style="display: flex; gap: 4px; align-items: center;" title="{{ product['colors']|length }} Farklı Renk">
                     {% for c in product['colors'][:4] %}
-                      <span class="color-dot-preview" data-color="{{ c['color_hex'] }}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #2453FF; border: 1px solid rgba(255,255,255,0.4); display: inline-block;"></span>
+                      <span class="color-dot-preview" data-color="{{ c['color_hex'] }}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #FFFFFF; border: 1px solid rgba(255,255,255,0.4); display: inline-block;"></span>
                     {% endfor %}
                     {% if product['colors']|length > 4 %}
                       <span style="font-size: 9px; font-family: var(--font-mono); color: var(--text-muted);">+{{ product['colors']|length - 4 }}</span>
@@ -241,7 +241,7 @@
     border-color: var(--electric-blue) !important;
     color: #FFFFFF !important;
     font-weight: 800 !important;
-    box-shadow: 0 4px 16px rgba(36, 83, 255, 0.45) !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.45) !important;
     transform: translateY(-1px);
   }
 </style>

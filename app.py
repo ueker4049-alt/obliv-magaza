@@ -1562,7 +1562,7 @@ def admin_update_settings():
     smtp_email = request.form.get('smtp_email', 'oblivwear@gmail.com').strip()
     smtp_app_password = request.form.get('smtp_app_password', '').strip()
 
-    theme_color = request.form.get('theme_color', '#2453FF').strip()
+    theme_color = request.form.get('theme_color', '#FFFFFF').strip()
     font_heading = request.form.get('font_heading', "'Big Shoulders Display', Impact, sans-serif").strip()
     font_body = request.form.get('font_body', "'Plus Jakarta Sans', sans-serif").strip()
 
@@ -2034,11 +2034,11 @@ def api_live_chat():
     elif any(w in user_msg for w in ['tamam', 'ok', 'anladım', 'anladim', 'peki', 'görüşürüz', 'bay']):
         return jsonify({"reply": "Harika! Keyifli alışverişler dilerim. İstediğiniz zaman tekrar yazabilirsiniz!"})
 
-    elif any(w in user_msg for w in ['ödeme', 'odeme', 'kart', 'taksit', 'iyzico', 'nasıl öderim', 'nasil oderim', 'güvenli mi']):
-        return jsonify({"reply": "Ödemelerinizi İyzico güvencesiyle tüm kredi ve banka kartlarınızla (3D Secure korumalı) tek çekim veya taksitle 7/24 güvenle gerçekleştirebilirsiniz."})
+    elif any(w in user_msg for w in ['ödeme', 'odeme', 'kart', 'taksit', 'shopier', 'iyzico', 'nasıl öderim', 'nasil oderim', 'güvenli mi']):
+        return jsonify({"reply": "Ödemelerinizi Shopier güvencesiyle tüm kredi ve banka kartlarınızla (3D Secure korumalı) tek çekim veya taksitle 7/24 hızlı ve güvenle gerçekleştirebilirsiniz."})
 
     elif any(w in user_msg for w in ['havale', 'eft', 'kapıda ödeme', 'kapida']):
-        return jsonify({"reply": "Şu anda güvenlik ve hızlı kargo süreci sebebiyle ödemelerimizi yalnızca İyzico 3D Secure kart altyapısı üzerinden kabul ediyoruz. Kapıda ödeme veya manuel havale yerine kartınızla güvenle sipariş oluşturabilirsiniz."})
+        return jsonify({"reply": "Şu anda maksimum alıcı güvenliği ve hızlı kargo süreci sebebiyle ödemelerimizi Shopier 3D Secure kart altyapısı üzerinden kabul ediyoruz. Kapıda ödeme veya manuel havale yerine Shopier ile tüm banka ve kredi kartlarınızla güvenle sipariş oluşturabilirsiniz."})
 
     elif any(w in user_msg for w in ['kargo takip', 'siparişim nerede', 'kargom nerede', 'takip numarası', 'kargom nerde']):
         return jsonify({"reply": "Siparişiniz kargoya teslim edildiğinde SMS ve e-posta adresinize MNG/Yurtiçi Kargo takip linkiniz otomatik gönderilir. Ayrıca hesabınıza giriş yaparak 'Profilim / Siparişlerim' sayfasından da anlık kargo durumunu görebilirsiniz."})
