@@ -2340,6 +2340,8 @@ def google_verification():
 def robots_txt():
     content = """User-agent: *
 Allow: /
+Allow: /favicon.ico
+Allow: /static/
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
