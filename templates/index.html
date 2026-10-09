@@ -238,6 +238,7 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
   }
 
@@ -346,7 +347,6 @@
                   data-color="{{ product['color_name']|escape }}"
                   data-size="M"
                   data-image="{{ product['image_url'] }}"
-                  onclick="addToCart('{{ product['id'] }}', '{{ product['name']|escape }}', '{{ product['price'] }}', '{{ product['color_name']|escape }}', 'M', '{{ product['image_url'] }}')"
                   style="cursor: pointer;">
                   SEPETE EKLE
                 </button>

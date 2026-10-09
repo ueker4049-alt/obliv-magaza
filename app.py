@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import random
 import string
 import time
@@ -1180,7 +1181,7 @@ def shopier_callback():
     conn = get_db()
     order = conn.execute("SELECT * FROM orders WHERE order_number = ?", (platform_order_id,)).fetchone()
 
-    if status and str(status).lower() in ['success', '1', 'successful']:
+    if status and status.lower() in ['success', '1', 'successful']:
         if order:
             conn.execute(
                 "UPDATE orders SET payment_status = 'Ödendi (Shopier)', card_last4 = 'SHOPIER' WHERE order_number = ?",

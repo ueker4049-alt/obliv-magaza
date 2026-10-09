@@ -80,7 +80,7 @@
                 <span class="ticket-badge ticket-status-closed">{{ t['status'] }}</span>
               {% endif %}
 
-              <form action="/support/{{ t['ticket_number'] }}/delete" method="POST" style="margin: 0;" onsubmit="event.stopPropagation(); return confirm('#{{ t['ticket_number'] }} nolu destek talebini silmek istediğinize emin misiniz?');">
+              <form action="/support/{{ t['ticket_number'] }}/delete" method="POST" style="margin: 0;" onsubmit="event.stopPropagation(); return confirm('Bu destek talebini silmek istediğinize emin misiniz?');">
                 <button type="submit" onclick="event.stopPropagation();" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #EF4444; border-radius: 8px; padding: 6px 10px; font-size: 11px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#EF4444';this.style.color='#FFF'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='#EF4444'" title="Talebi Sil">
                   🗑️ Sil
                 </button>
