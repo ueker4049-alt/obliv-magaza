@@ -302,6 +302,54 @@ a {
   background: var(--electric-blue);
 }
 
+.top-nav-cart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px;
+  background: #FFFFFF;
+  color: #000000;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  margin-left: 4px;
+}
+
+.top-nav-cart-btn:hover {
+  background: #E5E7EB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255, 255, 255, 0.6);
+}
+
+.top-nav-cart-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.top-cart-badge {
+  background: #000000;
+  color: #FFFFFF;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .nav-dropdown {
   position: relative;
 }
