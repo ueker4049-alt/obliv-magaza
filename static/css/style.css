@@ -1972,6 +1972,7 @@ a {
 
   .drip-img-wrap img {
     max-height: 160px !important;
+    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95)) !important;
   }
 
   .drip-album-badge {
@@ -2175,6 +2176,7 @@ a {
 
   .drip-img-wrap img {
     max-height: 135px !important;
+    filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95)) !important;
   }
 
   .drip-prod-name {
