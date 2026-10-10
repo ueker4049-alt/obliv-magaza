@@ -46,6 +46,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
         canvas = clean_shirt.copy()
         if kind == 'travis':
             face = cv2.imread('pure_face_travis.png')
+            if face is None:
+                return canvas
             gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
             alpha = np.clip((255 - gray).astype(float)/255.0 - 0.05, 0, 1) / 0.95
             tw = 215
@@ -59,6 +61,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
             canvas[y1:y1+th, x1:x1+tw] = np.clip(roi_c, 0, 255).astype(np.uint8)
         elif kind == 'tecca':
             tec = cv2.imread('clean_pure_tecca_chest.png', cv2.IMREAD_UNCHANGED)
+            if tec is None:
+                return canvas
             tw, th = 195, int(tec.shape[0] * (195 / tec.shape[1]))
             tec_res = cv2.resize(tec, (tw, th))
             rgb = tec_res[:, :, :3]
@@ -68,6 +72,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'trippie':
             tr = cv2.imread('clean_trippie.png', cv2.IMREAD_UNCHANGED)
+            if tr is None:
+                return canvas
             tw, th = 200, int(tr.shape[0] * (200 / tr.shape[1]))
             tr_res = cv2.resize(tr, (tw, th))
             rgb = tr_res[:, :, :3]
@@ -79,6 +85,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'lips':
             lp = cv2.imread('clean_lips.png', cv2.IMREAD_UNCHANGED)
+            if lp is None:
+                return canvas
             tw, th = 200, int(lp.shape[0] * (200 / lp.shape[1]))
             lp_res = cv2.resize(lp, (tw, th))
             rgb = lp_res[:, :, :3]
@@ -90,6 +98,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'dollar':
             dl = cv2.imread('clean_dollar.png', cv2.IMREAD_UNCHANGED)
+            if dl is None:
+                return canvas
             tw, th = 210, int(dl.shape[0] * (210 / dl.shape[1]))
             dl_res = cv2.resize(dl, (tw, th))
             rgb = dl_res[:, :, :3]
@@ -101,6 +111,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'drpepper':
             dp = cv2.imread('clean_drpepper.png', cv2.IMREAD_UNCHANGED)
+            if dp is None:
+                return canvas
             tw, th = 190, int(dp.shape[0] * (190 / dp.shape[1]))
             dp_res = cv2.resize(dp, (tw, th))
             rgb = dp_res[:, :, :3]
@@ -111,7 +123,10 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
             for c in range(3):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'frank':
-            fo = cv2.imread('clean_frank_ocean_graphic.png', cv2.IMREAD_UNCHANGED)[30:, :]
+            fo_raw = cv2.imread('clean_frank_ocean_graphic.png', cv2.IMREAD_UNCHANGED)
+            if fo_raw is None:
+                return canvas
+            fo = fo_raw[30:, :]
             tw, th = 175, int(fo.shape[0] * (175 / fo.shape[1]))
             fo_res = cv2.resize(fo, (tw, th))
             rgb = fo_res[:, :, :3]
@@ -121,6 +136,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'iam':
             iam = cv2.imread('crop_graphic_iam.png', cv2.IMREAD_UNCHANGED)
+            if iam is None:
+                return canvas
             tw, th = 210, int(iam.shape[0] * (210 / iam.shape[1]))
             iam_res = cv2.resize(iam, (tw, th))
             rgb = iam_res[:, :, :3]
@@ -130,6 +147,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'uzi':
             uz = cv2.imread('clean_uzi_letters.png', cv2.IMREAD_UNCHANGED)
+            if uz is None:
+                return canvas
             tw, th = 210, int(uz.shape[0] * (210 / uz.shape[1]))
             uz_res = cv2.resize(uz, (tw, th))
             rgb = uz_res[:, :, :3]
@@ -139,6 +158,8 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
                 canvas[y1:y1+th, x1:x1+tw, c] = (canvas[y1:y1+th, x1:x1+tw, c] * (1.0 - a) + rgb[:, :, c] * a).astype(np.uint8)
         elif kind == 'angel':
             ag = cv2.imread('clean_t1_angel_graphic.png', cv2.IMREAD_UNCHANGED)
+            if ag is None:
+                return canvas
             tw, th = 205, int(ag.shape[0] * (205 / ag.shape[1]))
             ag_res = cv2.resize(ag, (tw, th))
             rgb = ag_res[:, :, :3]
@@ -186,6 +207,7 @@ def generate_dreampay_exact_video(audio_path, output_path, total_frames=413):
 
     print(f"Rendering {total_frames} frames for {output_path}...")
     for f_i in range(total_frames):
+        frame_final = clean_shirts[0]
         in_pull = False
         for p_idx, (p_start, p_end) in enumerate(pull_intervals):
             if p_start <= f_i <= p_end:
